@@ -1,0 +1,23 @@
+$grid-breakpoints: (
+    xs: 399px,
+    sm: 575px,
+    md: 767px,
+    lg: 991px,
+    xl: 1199px,
+    xxl: 1399px,
+);
+
+$content-max-width: 1120px;
+$content-padding: 16px;
+$content-left-width: 265px;
+$content-right-width: 360px;
+
+$zIndex: (
+    menu: 100,
+    popup: 200,
+    chatBox: 300,
+    searchForm: 150,
+);
+
+$bg-grey: #f8f9fa;
+$white: #ffff;
