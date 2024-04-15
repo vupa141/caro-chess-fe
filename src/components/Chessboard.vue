@@ -1,6 +1,6 @@
 <template>
-    <div class="chessboard-container container p-5 ">
-        <div v-for="i in 20" :key={i} :class="`row-${i} d-flex`">
+    <div class="chessboard-container bg-gradient-to-r from-indigo-400 to-cyan-400 container p-5 ">
+        <div v-for="i in 20" :key={i} :class="`row-${i} flex`">
             <div 
                 v-for="j in 20"
                 :key={j} :class="[
@@ -18,15 +18,36 @@
                 <img v-else-if="chessboardData[i - 1][j - 1] == 1" src="../assets/images/icons8-o-50.png" width="23"/>
             </div>
         </div>
+        <el-dialog v-model="dialogVisible" width="300" class="!rounded-md" align-center>
+            <div class="flex justify-center items-center">
+                <img src="../assets/images/winner.webp" width="60" class="align-middle">
+                <div class="text-lg font-semi-bold">{{ winnerMessage }}</div   >
+            </div>
+            <template #footer>
+                <div class="dialog-footer flex justify-center">
+                    <el-button type="primary" @click="dialogVisible = false">
+                        OK
+                    </el-button>
+                </div>
+            </template>
+        </el-dialog>
     </div>
 </template>
 
 <script setup lang="ts">
+    import { useCommonStore } from '@/stores/common'
     import { reactive, ref } from 'vue'
     import Swal from 'sweetalert2'
+import { MODE } from '@/common/constant';
 
+    const dialogVisible = ref(false);
+    const winnerMessage = ref('');
+    const isPlaying = ref(true);
     let chessboardData = reactive([])
     const xoFlag = ref(0); // X = 0, O = 1
+
+    const commonStore = useCommonStore()
+    const appMode = commonStore.appMode
 
     const initChessboard = () => {
         for (let i = 0; i < 20; i += 1) {
@@ -49,14 +70,19 @@
     }
 
     const showWinnerMessage = async (winner: string) => {
-        await Swal.fire({
-            title: "Congratulations!",
-            text: `${winner} is the winner`,
-            icon: "success"
-        });
+        winnerMessage.value = `The winner is ${winner}`;
+        dialogVisible.value = true;
+        // await Swal.fire({
+        //     title: "Congratulations!",
+        //     text: `${winner} is the winner`,
+        //     icon: "success",
+        // });
     }
     const handleClick = (i: number, j: number) => {
-        if (chessboardData[i - 1][j - 1] === -1) {
+        if (appMode === MODE.START) {
+            return;
+        }
+        if (isPlaying.value && chessboardData[i - 1][j - 1] === -1) {
             chessboardData[i - 1][j - 1] = xoFlag.value;
             checkWinner(i - 1, j - 1);
             xoFlag.value = (xoFlag.value ? 0 : 1);
@@ -84,7 +110,9 @@
         }
         if (adjacentCellInRow === 4) {
             console.log(`${xo ? 'O' : 'X'} won`);
-            await showWinnerMessage(`${xo ? 'O' : 'X'}`)
+            await showWinnerMessage(`${xo ? 'O' : 'X'}`);
+            isPlaying.value = false;
+            return;
             // clearChestboard();
         }
 
@@ -107,7 +135,9 @@
         }
         if (adjacentCellInCol === 4) {
             console.log(`${xo ? 'O' : 'X'} won`);
-            await showWinnerMessage(`${xo ? 'O' : 'X'}`)
+            await showWinnerMessage(`${xo ? 'O' : 'X'}`);
+            isPlaying.value = false;
+            return;
             // clearChestboard();
         }
 
@@ -134,7 +164,9 @@
         }
         if (adjacentCellInFirstDiagonal === 4) {
             console.log(`${xo ? 'O' : 'X'} won`);
-            await showWinnerMessage(`${xo ? 'O' : 'X'}`)
+            await showWinnerMessage(`${xo ? 'O' : 'X'}`);
+            isPlaying.value = false;
+            return;
             // clearChestboard();
         }
 
@@ -160,20 +192,21 @@
             }
         }
         if (adjacentCellInSecondDiagonal === 4) {
-            console.log(`${xo ? 'O' : 'X'} won`);
-            await showWinnerMessage(`${xo ? 'O' : 'X'}`)
+            await showWinnerMessage(`${xo ? 'O' : 'X'}`);
+            isPlaying.value = false;
+            return;
             // clearChestboard();
         }
-        console.log('adjacentCellInRow: ', adjacentCellInRow)
-        console.log('adjacentCellInCol', adjacentCellInCol)
-        console.log('adjacentCellInD', adjacentCellInFirstDiagonal)
+        // console.log('adjacentCellInRow: ', adjacentCellInRow)
+        // console.log('adjacentCellInCol', adjacentCellInCol)
+        // console.log('adjacentCellInD', adjacentCellInFirstDiagonal)
     }
 </script>
 
 <style lang='scss' scoped>
 .chessboard-container {
     margin: auto;
-    background: #B8E2F2;
+    // background: #B8E2F2;
     border-radius: 12px;
     .record {
         width: 25px;

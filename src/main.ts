@@ -1,5 +1,6 @@
 import './assets/main.css';
-import './assets/bootstrap.min.css';
+// import './assets/bootstrap.min.css';
+import './assets/tw.css';
 import './assets/scss/global.scss';
 import ElementPlus from 'element-plus';
 import 'element-plus/dist/index.css';
