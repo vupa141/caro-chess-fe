@@ -59,16 +59,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { Form, Field, ErrorMessage } from 'vee-validate'
 import { View, Hide } from '@element-plus/icons-vue'
 import { validateEmail } from '@/common/veeValidateRule'
-import { login as logIn } from '@/services/user.service'
 import { ElNotification } from 'element-plus'
-import { useCommonStore } from '@/stores/common'
+import { useAuthStore } from '@/stores/auth'
 
-const commonStore = useCommonStore()
-const { setUser } = commonStore
+const { logIn } = useAuthStore()
 
 const email = ref('')
 const password = ref('')
@@ -81,20 +79,20 @@ const toggleShowPassword = () => {
 
 const login = async () => {
     const validate = await formRef?.value?.validate()
-    // console.log('validate: ', formRef.value.setFieldError())
     if (!validate?.valid) {
         return
     }
-    try {
-        const loginResult = await logIn({ email: email.value, password: password.value })
+    const loginResult = await logIn({ email: email.value, password: password.value })
+    if (loginResult.success) {
         ElNotification({
             type: 'success',
             message: 'Login Success. Welcome back!'
-        })
-        setUser(loginResult.data.user)
-        emit('close')
-    } catch (error: any) {
-        formRef.value.setFieldError(error?.errors[0].key, error.message)
+        });
+        emit('close');
+    }
+    else {
+        const error = loginResult.error;
+        formRef.value.setFieldError(error?.errors[0].key, error?.message)
     }
 }
 

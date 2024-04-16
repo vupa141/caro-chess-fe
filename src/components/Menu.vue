@@ -26,12 +26,12 @@
                     >
                         <el-button type="primary" round>Save Account</el-button>
                     </div>
-                    <el-divider class="!my-1" />
+                    <el-divider class="!my-1" v-if="user.type === USER_TYPE.GUEST"/>
                     <div class="px-8 py-2 hover:text-blue-400 cursor-pointer">
                         <FontAwesomeIcon :icon="faUser" class="mr-2" />
                         My Account
                     </div>
-                    <div class="px-8 py-2 hover:text-blue-400 cursor-pointer">
+                    <div class="px-8 py-2 hover:text-blue-400 cursor-pointer" @click="logout">
                         <FontAwesomeIcon :icon="faSignOut" class="mr-2" />
                         Log Out
                     </div>
@@ -75,9 +75,9 @@
 <script lang="ts" setup>
 import { Histogram, HomeFilled } from '@element-plus/icons-vue'
 import AuthDialog from '@/views/auth/AuthDialog.vue'
-import { ref, watch } from 'vue'
-import { useCommonStore } from '@/stores/common'
-import { USER_TYPE } from '@/common/constant'
+import { ref } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { ACCESS_TOKEN_KEY, USER_TYPE } from '@/common/constant'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import {
     faSignOut,
@@ -88,8 +88,10 @@ import {
     faRobot
 } from '@fortawesome/free-solid-svg-icons'
 import { storeToRefs } from 'pinia'
+import Cookies from 'js-cookie'
 
-const { user } = storeToRefs(useCommonStore())
+const { user } = storeToRefs(useAuthStore())
+const { getUser, logOut } = useAuthStore()
 
 const openAuth = ref(false)
 
@@ -99,6 +101,18 @@ const onCloseAuthDialog = () => {
 const onOpenAuthDialog = () => {
     openAuth.value = true
 }
+const getUserProfile = async () => {
+    const accessToken = Cookies.get(ACCESS_TOKEN_KEY);
+    if (accessToken) {
+        await getUser()
+    }
+}
+const logout = () => {
+    logOut()
+}
+
+getUserProfile();
+
 </script>
 
 <style lang="scss">

@@ -27,14 +27,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Form, Field, ErrorMessage } from 'vee-validate'
-import { useCommonStore } from '@/stores/common'
+import { useAuthStore } from '@/stores/auth'
 import { verifyAccount } from '@/services/user.service'
 import { ElNotification } from 'element-plus'
 import { USER_STATUS } from '@/common/constant'
 
-const commonStore = useCommonStore()
-const setUser = commonStore.setUser
-const user = commonStore.user
+const { setUserStatus } = useAuthStore()
 const token = ref('')
 const formRef = ref<any>(null)
 const emit = defineEmits(['back', 'close'])
@@ -50,10 +48,7 @@ const verify = async () => {
             type: 'success',
             message: 'Verify Email Success!'
         })
-        setUser({
-            ...user,
-            status: USER_STATUS.VERIFIED
-        })
+        setUserStatus(USER_STATUS.VERIFIED)
         emit('close')
     } catch (error: any) {
         formRef.value.setFieldError(error?.errors[0].key, error.message)

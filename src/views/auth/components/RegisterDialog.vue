@@ -100,8 +100,7 @@ import { ElNotification } from 'element-plus'
 import { Form, Field, ErrorMessage } from 'vee-validate'
 import { View, Hide } from '@element-plus/icons-vue'
 import { validateEmail, validatePassword, validateName } from '@/common/veeValidateRule'
-import { register } from '@/services/user.service'
-import { useCommonStore } from '@/stores/common'
+import { useAuthStore } from '@/stores/auth'
 
 const email = ref('')
 const password = ref('')
@@ -111,8 +110,7 @@ const showPassword = ref(false)
 const registerFormRef = ref<any>(null)
 const emit = defineEmits(['openLogin', 'verify'])
 
-const commonStore = useCommonStore()
-const setUser = commonStore.setUser
+const { register } = useAuthStore()
 
 const toggleShowPassword = () => {
     showPassword.value = !showPassword.value
@@ -131,25 +129,26 @@ const validatePasswordConfirmation = (value: string) => {
 }
 
 const signUp = async () => {
-    const result = await registerFormRef.value?.validate()
-    if (!result?.valid) {
+    const validate = await registerFormRef.value?.validate()
+    if (!validate?.valid) {
         return
     }
-    try {
-        const registerResult = await register({
-            username: username.value,
-            email: email.value,
-            password: password.value
-        })
-        setUser(registerResult.data.user)
+    const result = await register({
+        username: username.value,
+        email: email.value,
+        password: password.value
+    })
+    if (result.success) {
         ElNotification({
             type: 'success',
             message: 'Register Success'
         })
         registerFormRef.value?.resetForm()
         emit('verify')
-    } catch (error: any) {
-        registerFormRef.value.setFieldError(error?.errors[0].key, error.message)
+    }
+    else {
+        const error = result.error;
+        registerFormRef.value.setFieldError(error?.errors[0].key, error?.message);
     }
 }
 </script>
