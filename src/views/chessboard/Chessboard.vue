@@ -17,19 +17,19 @@
             >
                 <img
                     v-if="chessboardData[i - 1][j - 1] == 0"
-                    src="../assets/images/icons8-x-48.png"
+                    src="@/assets/images/icons8-x-48.png"
                     width="23"
                 />
                 <img
                     v-else-if="chessboardData[i - 1][j - 1] == 1"
-                    src="../assets/images/icons8-o-50.png"
+                    src="@/assets/images/icons8-o-50.png"
                     width="23"
                 />
             </div>
         </div>
         <el-dialog v-model="dialogVisible" width="300" class="!rounded-md" align-center>
             <div class="flex justify-center items-center">
-                <img src="../assets/images/winner.webp" width="60" class="align-middle" />
+                <img src="@/assets/images/winner.webp" width="60" class="align-middle" />
                 <div class="text-lg font-semi-bold">{{ winnerMessage }}</div>
             </div>
             <template #footer>
