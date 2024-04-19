@@ -1,9 +1,9 @@
 <template>
-    <div class="chessboard-container bg-gradient-to-r from-indigo-400 to-cyan-400 container p-5">
-        <div v-for="i in 20" :key="{ i }" :class="`row-${i} flex`">
+    <div :class="`chessboard-container bg-gradient-to-r ${bg[Math.floor(Math.random() * bg.length)]} container p-5`">
+        <div v-for="i in 20" :key="i" :class="`row-${i} flex`">
             <div
                 v-for="j in 20"
-                :key="{ j }"
+                :key="j"
                 :class="[
                     `record record-${i}-${j} border border-secondary`,
                     {
@@ -49,8 +49,17 @@ import { MODE } from '@/common/constant'
 const dialogVisible = ref(false)
 const winnerMessage = ref('')
 const isPlaying = ref(true)
-let chessboardData = reactive([])
+let chessboardData = reactive<number[][]>([])
 const xoFlag = ref(0) // X = 0, O = 1
+
+const bg = [
+    'from-pink-500 to-yellow-500',
+    'from-indigo-400 to-cyan-400',
+    'from-blue-300 to-yellow-300',
+    'from-fuchsia-600 to-pink-600',
+    'from-green-300 to-yellow-300',
+    'from-pink-500 to-violet-600'
+]
 
 const commonStore = useCommonStore()
 const appMode = commonStore.appMode

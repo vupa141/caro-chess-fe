@@ -15,8 +15,16 @@
         <ForgotPasswordDialog
             v-else-if="mode === MODE.FORGOT_PASSWORD"
             @openRegister="openRegister"
+            @openSetPassword="openSetPassword"
         />
-        <VerifyAccountDialog v-else-if="mode === MODE.VERIFY_ACCOUNT" @close="handleClose" />
+        <ResetPasswordDialog
+            v-else-if="mode === MODE.RESET_PASSWORD"
+            @openLogin="openLogin"
+        />
+        <VerifyAccountDialog
+            v-else-if="mode === MODE.VERIFY_ACCOUNT"
+            @close="handleClose"
+        />
     </el-dialog>
 </template>
 
@@ -26,6 +34,7 @@ import LoginDialog from './components/LoginDialog.vue'
 import RegisterDialog from './components/RegisterDialog.vue'
 import ForgotPasswordDialog from './components/ForgotPasswordDialog.vue'
 import VerifyAccountDialog from './components/VerifyAccountDialog.vue'
+import ResetPasswordDialog from './components/ResetPasswordDialog.vue'
 const props = defineProps({
     openModal: Boolean
 })
@@ -62,10 +71,14 @@ const openVerify = () => {
     mode.value = MODE.VERIFY_ACCOUNT
 }
 
+const openSetPassword  = () => {
+    mode.value = MODE.RESET_PASSWORD
+}
+
 const emit = defineEmits(['close'])
 
 const handleClose = () => {
-    ;(loginRef as any)?.value?.formRef?.resetForm()
+    (loginRef as any)?.value?.formRef?.resetForm()
     mode.value = MODE.LOGIN
     open.value = false
     emit('close')

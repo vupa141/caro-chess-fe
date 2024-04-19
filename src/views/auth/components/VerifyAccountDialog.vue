@@ -6,7 +6,7 @@
                     >Enter verification code to verify your email
                     <span class="text-red-500">(*)</span></span
                 >
-                <Field name="forgot-pw-email" type="email" rules="required" v-slot="{ field }">
+                <Field name="token" rules="required" v-slot="{ field }">
                     <el-input
                         v-bind="field"
                         v-model="token"
@@ -15,43 +15,42 @@
                         size="large"
                     />
                 </Field>
-                <ErrorMessage name="forgot-pw-email" class="text-red-500" />
+                <ErrorMessage name="token" class="text-red-500" />
             </div>
             <div class="flex justify-end">
                 <el-button type="primary" @click="verify" class="w-full mt-5"> Verify </el-button>
             </div>
         </div> </Form
-    >>
+    >
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Form, Field, ErrorMessage } from 'vee-validate'
 import { useAuthStore } from '@/stores/auth'
-import { verifyAccount } from '@/services/user.service'
 import { ElNotification } from 'element-plus'
-import { USER_STATUS } from '@/common/constant'
 
-const { setUserStatus } = useAuthStore()
+const { verifyUser } = useAuthStore()
 const token = ref('')
 const formRef = ref<any>(null)
-const emit = defineEmits(['back', 'close'])
+const emit = defineEmits(['close'])
 
 const verify = async () => {
     const result = await formRef.value?.validate()
     if (!result?.valid) {
         return
     }
-    try {
-        await verifyAccount(token.value)
+    const verifyResult = await verifyUser(token.value)
+    if (verifyResult.success) {
         ElNotification({
-            type: 'success',
-            message: 'Verify Email Success!'
-        })
-        setUserStatus(USER_STATUS.VERIFIED)
+        type: 'success',
+        message: 'Verify Email Success!'
+    })
         emit('close')
-    } catch (error: any) {
-        formRef.value.setFieldError(error?.errors[0].key, error.message)
+    }
+    else {
+        const error = verifyResult.error
+        formRef.value.setFieldError(error?.errors[0].key, error?.message)
     }
 }
 </script>

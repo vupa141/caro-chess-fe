@@ -1,5 +1,5 @@
 <template>
-    <Form ref="forgotPasswordFormRef">
+    <Form ref="formRef">
         <div class="py-4">
             <div>
                 <span
@@ -38,20 +38,34 @@
 import { ref } from 'vue'
 import { Form, Field, ErrorMessage } from 'vee-validate'
 import { validateEmail } from '@/common/veeValidateRule'
+import { forgotPassword } from '@/services/user.service';
+import { ElNotification } from 'element-plus';
+import type { Error } from '@/interface/common.interface';
 
 const email = ref('')
-const forgotPasswordFormRef = ref<any>(null)
-const emit = defineEmits(['openRegister'])
+const formRef = ref<any>(null)
+const emit = defineEmits(['openRegister', 'openSetPassword'])
 
 const findAccount = async () => {
-    const result = await forgotPasswordFormRef.value?.validate()
-    if (!result?.valid) {
+    const validate = await formRef.value?.validate()
+    if (!validate?.valid) {
         return
+    }
+    try {
+        await forgotPassword(email.value)
+        ElNotification({
+            type: 'success',
+            message: 'We have sent you an email with an verification code. Please enter the code to reset your password.'
+        })
+        emit('openSetPassword')
+    }
+    catch (error) {
+        formRef.value.setFieldError((error as Error)?.errors[0].key, (error as Error)?.message)
     }
 }
 
 const openRegister = async () => {
-    await forgotPasswordFormRef?.value?.resetForm()
+    await formRef?.value?.resetForm()
     emit('openRegister')
 }
 </script>

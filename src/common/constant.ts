@@ -22,6 +22,10 @@ export const ACCESS_TOKEN_KEY = 'access_token'
 
 export const REFRESH_TOKEN_KEY = 'refresh_token'
 
+export const GUEST_ID = 'guest_id'
+
+export const COMMON_ERROR_MSG = 'An error occurred. Please try again later.'
+
 export const HTTP_STATUS_CODE = {
     SUCCESS: 200,
     BAD_REQUEST: 400,

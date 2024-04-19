@@ -58,11 +58,11 @@
                 <FontAwesomeIcon :icon="faGamepad" class="mr-2" />
                 <span>Start A Game</span>
             </template>
-            <el-menu-item index="1-1">
+            <el-menu-item index="1-1" @click="playWithFriend">
                 <FontAwesomeIcon :icon="faUserFriends" class="mr-2" />
                 Play with your friend
             </el-menu-item>
-            <el-menu-item index="1-2">
+            <el-menu-item index="1-2" @click="playWithRobot">
                 <FontAwesomeIcon :icon="faRobot" class="mr-2" />
                 Play with robot
             </el-menu-item>
@@ -70,14 +70,16 @@
         <el-divider />
     </el-menu>
     <AuthDialog :openModal="openAuth" @close="onCloseAuthDialog" />
+    <GuestRegisterDialog :openModal="openGuestRegister" @close="onCloseGuestRegister" />
 </template>
 
 <script lang="ts" setup>
 import { Histogram, HomeFilled } from '@element-plus/icons-vue'
 import AuthDialog from '@/views/auth/AuthDialog.vue'
+import GuestRegisterDialog from '@/views/auth/GuestRegisterDialog.vue'
 import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { ACCESS_TOKEN_KEY, USER_TYPE } from '@/common/constant'
+import { ACCESS_TOKEN_KEY, GUEST_ID, USER_TYPE } from '@/common/constant'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import {
     faSignOut,
@@ -91,24 +93,47 @@ import { storeToRefs } from 'pinia'
 import Cookies from 'js-cookie'
 
 const { user } = storeToRefs(useAuthStore())
-const { getUser, logOut } = useAuthStore()
+const { getUser, logOut, guestLogIn } = useAuthStore()
 
 const openAuth = ref(false)
+const openGuestRegister = ref(false)
 
 const onCloseAuthDialog = () => {
     openAuth.value = false
 }
+
+const onCloseGuestRegister = () => {
+    openGuestRegister.value = false
+}
+
 const onOpenAuthDialog = () => {
     openAuth.value = true
 }
 const getUserProfile = async () => {
-    const accessToken = Cookies.get(ACCESS_TOKEN_KEY);
-    if (accessToken) {
-        await getUser()
+    const guestId = localStorage.getItem(GUEST_ID);
+    if (guestId) {
+        await guestLogIn();
+    }
+    else {
+        const accessToken = Cookies.get(ACCESS_TOKEN_KEY);
+        if (accessToken) {
+            await getUser()
+        }
     }
 }
 const logout = () => {
     logOut()
+}
+const playWithFriend = () => {
+    registerGuestIfNotLoggedIn()
+}
+const playWithRobot = () => {
+    registerGuestIfNotLoggedIn()
+}
+const registerGuestIfNotLoggedIn = () => {
+    if (!user.value) {
+        openGuestRegister.value = true
+    }
 }
 
 getUserProfile();
