@@ -34,3 +34,19 @@ export const HTTP_STATUS_CODE = {
     NOT_FOUND: 404,
     SERVER_ERROR: 500,
 }
+
+export enum GAME_MODE {
+    PVP = 'pvp',
+    PVB = 'pvb',
+}
+
+export enum GAME_STATUS {
+    WAITNG = 'wating',
+    PLAYING = 'playing',
+    FINISHED = 'finished',
+}
+
+export enum MOVE_TYPE {
+    X = '0',
+    O = '1',
+}

@@ -97,7 +97,6 @@ export const useAuthStore = defineStore('auth', () => {
                 newUser.avatar = '/default-avatar/default-avatar-1.svg';
             };
             user.value = newUser;
-            console.log('get user: ', user.value)
         }
         catch (error) {
 

@@ -71,15 +71,17 @@
     </el-menu>
     <AuthDialog :openModal="openAuth" @close="onCloseAuthDialog" />
     <GuestRegisterDialog :openModal="openGuestRegister" @close="onCloseGuestRegister" />
+    <CreateGame :openModal="openCreateGame" @close="onCloseCreateGame" :mode="selectedGameMode"/>
 </template>
 
 <script lang="ts" setup>
 import { Histogram, HomeFilled } from '@element-plus/icons-vue'
 import AuthDialog from '@/views/auth/AuthDialog.vue'
 import GuestRegisterDialog from '@/views/auth/GuestRegisterDialog.vue'
+import CreateGame from './CreateGame.vue'
 import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { ACCESS_TOKEN_KEY, GUEST_ID, USER_TYPE } from '@/common/constant'
+import { ACCESS_TOKEN_KEY, GAME_MODE, GUEST_ID, USER_TYPE } from '@/common/constant'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import {
     faSignOut,
@@ -97,6 +99,8 @@ const { getUser, logOut, guestLogIn } = useAuthStore()
 
 const openAuth = ref(false)
 const openGuestRegister = ref(false)
+const openCreateGame = ref(false)
+const selectedGameMode = ref<GAME_MODE | null>(null)
 
 const onCloseAuthDialog = () => {
     openAuth.value = false
@@ -109,6 +113,12 @@ const onCloseGuestRegister = () => {
 const onOpenAuthDialog = () => {
     openAuth.value = true
 }
+
+const onCloseCreateGame = () => {
+    openCreateGame.value = false
+    selectedGameMode.value = null
+}
+
 const getUserProfile = async () => {
     const guestId = localStorage.getItem(GUEST_ID);
     if (guestId) {
@@ -126,9 +136,15 @@ const logout = () => {
 }
 const playWithFriend = () => {
     registerGuestIfNotLoggedIn()
+    selectedGameMode.value = GAME_MODE.PVP
+    openCreateGame.value = true
+    console.log('mode = ', selectedGameMode.value)
 }
 const playWithRobot = () => {
     registerGuestIfNotLoggedIn()
+    selectedGameMode.value = GAME_MODE.PVB
+    openCreateGame.value = true
+    console.log('mode = ', selectedGameMode.value)
 }
 const registerGuestIfNotLoggedIn = () => {
     if (!user.value) {

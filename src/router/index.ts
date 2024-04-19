@@ -9,6 +9,11 @@ const router = createRouter({
             path: '/',
             name: 'home',
             component: Home
+        },
+        {
+            path: '/game/:id',
+            name: 'game',
+            component: Chessboard
         }
     ]
 })
