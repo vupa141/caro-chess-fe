@@ -32,7 +32,6 @@ const { guestRegister } = useAuthStore()
 const emit = defineEmits(['close'])
 
 watch(props, (prop) => {
-    console.log(props)
     open.value = prop.openModal
 })
 

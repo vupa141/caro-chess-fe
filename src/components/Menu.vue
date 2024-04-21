@@ -138,13 +138,11 @@ const playWithFriend = () => {
     registerGuestIfNotLoggedIn()
     selectedGameMode.value = GAME_MODE.PVP
     openCreateGame.value = true
-    console.log('mode = ', selectedGameMode.value)
 }
 const playWithRobot = () => {
     registerGuestIfNotLoggedIn()
     selectedGameMode.value = GAME_MODE.PVB
     openCreateGame.value = true
-    console.log('mode = ', selectedGameMode.value)
 }
 const registerGuestIfNotLoggedIn = () => {
     if (!user.value) {

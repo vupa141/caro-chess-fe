@@ -50,3 +50,10 @@ export enum MOVE_TYPE {
     X = '0',
     O = '1',
 }
+
+export const avatars = [
+    '/default-avatar/default-avatar-1.svg',
+    '/default-avatar/default-avatar-2.png',
+    '/default-avatar/default-avatar-3.webp',
+    '/default-avatar/default-avatar-4.png'
+]

@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Chessboard from '@/views/chessboard/Chessboard.vue'
+import Game from '@/views/game/Game.vue'
 import Home from '@/views/home/Home.vue'
 
 const router = createRouter({
@@ -13,7 +13,7 @@ const router = createRouter({
         {
             path: '/game/:id',
             name: 'game',
-            component: Chessboard
+            component: Game
         }
     ]
 })

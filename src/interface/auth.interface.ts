@@ -8,7 +8,8 @@ export interface LoginData {
 export interface SignupData {
     email: string
     username: string
-    password: string
+    password: string,
+    avatar: string
 }
 
 export interface User {

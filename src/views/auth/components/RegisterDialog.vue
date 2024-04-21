@@ -101,6 +101,7 @@ import { Form, Field, ErrorMessage } from 'vee-validate'
 import { View, Hide } from '@element-plus/icons-vue'
 import { validateEmail, validatePassword, validateName } from '@/common/veeValidateRule'
 import { useAuthStore } from '@/stores/auth'
+import { avatars } from '@/common/constant'
 
 const email = ref('')
 const password = ref('')
@@ -136,7 +137,8 @@ const signUp = async () => {
     const result = await register({
         username: username.value,
         email: email.value,
-        password: password.value
+        password: password.value,
+        avatar: avatars[Math.round(Math.random() * (avatars.length  - 1))]
     })
     if (result.success) {
         ElNotification({

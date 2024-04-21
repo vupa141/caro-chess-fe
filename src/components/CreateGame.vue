@@ -27,17 +27,23 @@
 </template>
 
 <script setup lang="ts">
-import { COMMON_ERROR_MSG } from '@/common/constant';
-import { useAuthStore } from '@/stores/auth';
-import { ElNotification } from 'element-plus';
 import { ref, watch } from 'vue'
-import { GAME_MODE } from '../common/constant';
+import { COMMON_ERROR_MSG, GAME_MODE } from '../common/constant';
+import { useAuthStore } from '@/stores/auth';
+import { storeToRefs } from 'pinia';
+import { useRouter } from 'vue-router'
+import { useGameStore } from '@/stores/game';
+import { ElNotification } from 'element-plus';
 
 const props = defineProps<{
     openModal: boolean,
     mode: GAME_MODE | null
 }>()
 
+const router = useRouter()
+const { user } =  storeToRefs(useAuthStore())
+const { createGame } = useGameStore()
+const { game } = storeToRefs(useGameStore())
 const selectValue = ref(0)
 const options = ref([
     {
@@ -65,6 +71,24 @@ const handleClose = () => {
     emit('close')
 }
 const confirm = async () => {
-
+    const createGameData = {
+        mode: props.mode as GAME_MODE,
+        ...selectValue.value ? {
+            xPlayer: user.value?._id
+        } : {
+            oPlayer: user.value?._id
+        }
+    }
+    const result = await createGame(createGameData)
+    if (result.success) {
+        router.push(`/game/${game?.value?._id}`)
+    }
+    else {
+        ElNotification({
+            type: 'error',
+            message: COMMON_ERROR_MSG
+        })
+    }
+    emit('close')
 }
 </script>
