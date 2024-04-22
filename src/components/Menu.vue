@@ -70,7 +70,7 @@
         <el-divider />
     </el-menu>
     <AuthDialog :openModal="openAuth" @close="onCloseAuthDialog" />
-    <GuestRegisterDialog :openModal="openGuestRegister" @close="onCloseGuestRegister" />
+    <GuestRegisterDialog :openModal="openGuestRegister" @close="onCloseGuestRegister" @success="onGuestRegisterSuccess"/>
     <CreateGame :openModal="openCreateGame" @close="onCloseCreateGame" :mode="selectedGameMode"/>
 </template>
 
@@ -135,19 +135,26 @@ const logout = () => {
     logOut()
 }
 const playWithFriend = () => {
-    registerGuestIfNotLoggedIn()
     selectedGameMode.value = GAME_MODE.PVP
-    openCreateGame.value = true
-}
-const playWithRobot = () => {
-    registerGuestIfNotLoggedIn()
-    selectedGameMode.value = GAME_MODE.PVB
-    openCreateGame.value = true
-}
-const registerGuestIfNotLoggedIn = () => {
-    if (!user.value) {
+    if (user.value) {
+        openCreateGame.value = true
+    }
+    else {
         openGuestRegister.value = true
     }
+}
+const playWithRobot = () => {
+    selectedGameMode.value = GAME_MODE.PVB
+    if (user.value) {
+        openCreateGame.value = true
+    }
+    else {
+        openGuestRegister.value = true
+    }
+}
+
+const onGuestRegisterSuccess = () => {
+    openCreateGame.value = true
 }
 
 getUserProfile();

@@ -29,7 +29,7 @@ const props = defineProps({
 })
 
 const { guestRegister } = useAuthStore()
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'success'])
 
 watch(props, (prop) => {
     open.value = prop.openModal
@@ -46,6 +46,7 @@ const confirm = async () => {
     const result = await guestRegister(username.value);
     if (result.success) {
         emit('close')
+        emit('success')
     }
     else {
         ElNotification({

@@ -1,28 +1,31 @@
 <template>
-    <div
-        class="loading-countdown-overlay fixed top-0 left-0 w-screen h-screen z-[9998] bg-gray-900 opacity-15"
-        v-if="countDown">
+    <div>
+        <div
+            class="loading-countdown-overlay fixed top-0 left-0 w-screen h-screen z-[9998] bg-gray-900 opacity-15"
+            v-if="countDown">
+        </div>
+        <div
+            class="loading-countdown fixed top-0 left-0 w-screen h-screen z-[9999] flex justify-center items-center"
+            v-if="countDown">
+            <div class="font-bold text-7xl text-black">{{ countDown }}</div>
+        </div>
+    
+        <GameStatus
+            :xoFlag="xoFlag"
+            :time="time"
+            :isYourTurn="isYourTurn"
+        />
+        <Chessboard
+            ref="chessboardRef"
+            :xoFlag="xoFlag"
+            @setXoFlag="setXoFlag"
+            :time="time"
+            @resetTime="resetTime"
+            :isYourTurn="isYourTurn"
+            @finishGame="finishGame"
+        />
     </div>
-    <div
-        class="loading-countdown fixed top-0 left-0 w-screen h-screen z-[9999] flex justify-center items-center"
-        v-if="countDown">
-        <div class="font-bold text-7xl text-black">{{ countDown }}</div>
-    </div>
-   
-    <GameStatus
-        :xoFlag="xoFlag"
-        :time="time"
-        :isYourTurn="isYourTurn"
-    />
-    <Chessboard
-        ref="chessboardRef"
-        :xoFlag="xoFlag"
-        @setXoFlag="setXoFlag"
-        :time="time"
-        @resetTime="resetTime"
-        :isYourTurn="isYourTurn"
-        @finishGame="finishGame"
-    />
+
 </template>
 
 <script setup lang="ts">
@@ -32,7 +35,7 @@ import { useGameStore } from '@/stores/game';
 import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
-import { ref, onUnmounted, computed } from 'vue';
+import { ref, onUnmounted, computed, watch } from 'vue';
 
 const { user } = storeToRefs(useAuthStore());
 const { game } = storeToRefs(useGameStore());
@@ -69,8 +72,14 @@ const finishGame = () => {
     clearInterval(timeInvertal)
 }
 
-getGame(useRoute().params.id as string)
+const route = useRoute()
+getGame(route.params.id as string)
 
+const gameId = computed(() => route.params.id)
+
+watch(gameId, () => {
+    window.location.reload()
+})
 const countDownInterval = setInterval(() => {
     countDown.value --;
     if (!countDown.value) {

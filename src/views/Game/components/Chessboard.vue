@@ -13,7 +13,7 @@
                         'border-right-2': j == 20
                     }
                 ]"
-                @click="handleClick(i, j)"
+                @click="handleClick(i - 1, j - 1)"
             >
                 <img
                     v-if="chessboardData[i - 1][j - 1] == 0"
@@ -29,7 +29,7 @@
         </div>
         <el-dialog v-model="dialogVisible" width="400" class="!rounded-md" align-center>
             <div class="flex justify-center items-center">
-                <FontAwesomeIcon :icon="faMedal" class="mr-2 text-3xl" color="#FFD700"/>
+                <FontAwesomeIcon :icon="resultIcon" class="mr-2 text-3xl" color="gray"/>
                 <div class="text-lg font-semi-bold">{{ resultMessage }}</div>
             </div>
             <template #footer>
@@ -47,11 +47,11 @@ import { useGameStore } from '@/stores/game';
 import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia';
 import { GAME_MODE } from '@/common/constant';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
     faFaceSadCry,
     faMedal
-} from '@fortawesome/free-solid-svg-icons'
+} from '@fortawesome/free-solid-svg-icons';
 
 const { game } = storeToRefs(useGameStore());
 const { user } = storeToRefs(useAuthStore());
@@ -60,6 +60,7 @@ const resultMessage = ref('')
 const resultIcon = ref<any>(null)
 const gameEnded = ref(false)
 let chessboardData = reactive<number[][]>([])
+const cellFilled = ref(0)
 const bg = [
     'from-violet-500 to-fuchsia-300',
     'from-indigo-400 to-cyan-200',
@@ -99,20 +100,34 @@ const clearChestboard = () => {
     }
 }
 
-const showResultMessage = async (win: boolean) => {
-    resultMessage.value = win ? 'Congratulations. You won.' : 'You lost. Better luck next time.'
-    resultIcon.value = win ? faMedal : faFaceSadCry
+const showResultMessage = (win: number) => {
+    resultMessage.value = (win === 1 
+        ? 'Congratulations. You won.'
+        : (
+            win === -1
+            ? 'You lost. Better luck next time.'
+            : 'It\'s a draw.'
+        ))
+    resultIcon.value = win >= 0 ? faMedal : faFaceSadCry
     dialogVisible.value = true
 }
 
 const handleClick = (i: number, j: number) => {
-    if (chessboardData[i - 1][j - 1] === -1 && props.isYourTurn && !gameEnded.value) {
-        chessboardData[i - 1][j - 1] = props.xoFlag
-        checkWinner(i - 1, j - 1)
-        console.log('game ended: ', gameEnded.value)
+    if (chessboardData[i][j] === -1 && props.isYourTurn && !gameEnded.value) {
+        chessboardData[i][j] = props.xoFlag
+        checkWinner(i, j)
         if (!gameEnded.value) {
-            emit('setXoFlag')
-            emit('resetTime')
+            cellFilled.value += 1
+            // draw game
+            if (cellFilled.value === 40) {
+                gameEnded.value = true
+                showResultMessage(0)
+                emit('finishGame')
+            }
+            else {
+                emit('setXoFlag')
+                emit('resetTime')
+            }
         }
     }
 }
@@ -121,14 +136,62 @@ const isXPlayer = computed(() => {
     return user?.value?._id === game.value?.xPlayer?._id
 });
 
-const checkWinner = async (rowIndex: number, colIndex: number) => {
+const checkWinner = (rowIndex: number, colIndex: number) => {
     const xo = chessboardData[rowIndex][colIndex]
 
+    let { adjacentCellInRow } = countAdjacentCellsInRow(rowIndex, colIndex, xo)
+    if (adjacentCellInRow === 4) {
+        gameEnded.value = true
+        const win = ((isXPlayer.value && xo === 0) || (!isXPlayer.value && xo === 1)) ? 1 : -1
+        showResultMessage(win)
+        emit('finishGame')
+        return
+        // clearChestboard();
+    }
+
+    let { adjacentCellInCol } = countAdjacentCellsInCol(rowIndex, colIndex, xo)
+    if (adjacentCellInCol === 4) {
+        gameEnded.value = true
+        const win = ((isXPlayer.value && xo === 0) || (!isXPlayer.value && xo === 1)) ? 1 : -1
+        showResultMessage(win)
+        emit('finishGame')
+        return
+        // clearChestboard();
+    }
+
+    // top left diagonal
+    let { adjacentCellInTopLeftDiagonal } = countAdjacentCelsInTopLeftDiagonal(rowIndex, colIndex, xo)
+    if (adjacentCellInTopLeftDiagonal === 4) {
+        gameEnded.value = true
+        const win = ((isXPlayer.value && xo === 0) || (!isXPlayer.value && xo === 1)) ? 1 : -1
+        showResultMessage(win)
+        emit('finishGame')
+        return
+        // clearChestboard();
+    }
+
+    // top right diagonal
+    let { adjacentCellInTopRightDiagonal } = countAdjacentCelsInTopRightDiagonal(rowIndex, colIndex, xo)
+    if (adjacentCellInTopRightDiagonal === 4) {
+        gameEnded.value = true
+        const win = ((isXPlayer.value && xo === 0) || (!isXPlayer.value && xo === 1)) ? 1 : -1
+        showResultMessage(win)
+        emit('finishGame')
+        return
+        // clearChestboard();
+    }
+}
+
+const countAdjacentCellsInRow = (rowIndex: number, colIndex: number, xo: number) => {
     let adjacentCellInRow = 0
+    let blockedSide = 0
     for (let j = colIndex + 1; j < 20; j += 1) {
         if (chessboardData[rowIndex][j] === xo) {
             adjacentCellInRow += 1
         } else {
+            if (chessboardData[rowIndex][j] !== 1) {
+                blockedSide += 1
+            }
             break
         }
     }
@@ -136,22 +199,28 @@ const checkWinner = async (rowIndex: number, colIndex: number) => {
         if (chessboardData[rowIndex][j] === xo) {
             adjacentCellInRow += 1
         } else {
+            if (chessboardData[rowIndex][j] !== 1) {
+                blockedSide += 1
+            }
             break
         }
     }
-    if (adjacentCellInRow === 4) {
-        gameEnded.value = true
-        const win = (isXPlayer.value && xo === 0) || (!isXPlayer.value && xo === 1)
-        await showResultMessage(win)
-        emit('finishGame')
-        // clearChestboard();
+    return {
+        adjacentCellInRow,
+        blockedSide
     }
+}
 
+const countAdjacentCellsInCol = (rowIndex: number, colIndex: number, xo: number) => {
     let adjacentCellInCol = 0
+    let blockedSide = 0
     for (let i = rowIndex + 1; i < 20; i += 1) {
         if (chessboardData?.[i]?.[colIndex] === xo) {
             adjacentCellInCol += 1
         } else {
+            if (chessboardData?.[i]?.[colIndex] !== -1) {
+                blockedSide += 1
+            }
             break
         }
     }
@@ -159,86 +228,111 @@ const checkWinner = async (rowIndex: number, colIndex: number) => {
         if (chessboardData?.[i]?.[colIndex] === xo) {
             adjacentCellInCol += 1
         } else {
+            if (chessboardData?.[i]?.[colIndex] !== -1) {
+                blockedSide += 1
+            }
             break
         }
     }
-    if (adjacentCellInCol === 4) {
-        gameEnded.value = true
-        const win = (isXPlayer.value && xo === 0) || (!isXPlayer.value && xo === 1)
-        await showResultMessage(win)
-        emit('finishGame')
-        return
-        // clearChestboard();
+    return {
+        adjacentCellInCol,
+        blockedSide
     }
+} 
 
-    let adjacentCellInFirstDiagonal = 0
+const countAdjacentCelsInTopLeftDiagonal = (rowIndex: number, colIndex: number, xo: number) => {
+    let adjacentCellInTopLeftDiagonal = 0
+    let blockedSide = 0
     let i = rowIndex
     let j = colIndex
-    while (i < 20 && j < 20) {
-        if (chessboardData[--i][--j] === xo) {
-            adjacentCellInFirstDiagonal += 1
+    while (i >= 0 && j >= 0) {
+        if (chessboardData?.[--i]?.[--j] === xo) {
+            adjacentCellInTopLeftDiagonal += 1
         } else {
+            if (chessboardData?.[i]?.[j] !== -1) {
+                blockedSide += 1;
+            }
             break
         }
     }
     i = rowIndex
     j = colIndex
     while (i < 20 && j < 20) {
-        if (chessboardData[++i][++j] === xo) {
-            adjacentCellInFirstDiagonal += 1
+        if (chessboardData?.[++i]?.[++j] === xo) {
+            adjacentCellInTopLeftDiagonal += 1
         } else {
+            if (chessboardData?.[i]?.[j] !== -1) {
+                blockedSide += 1
+            }
             break
         }
     }
-    if (adjacentCellInFirstDiagonal === 4) {
-        gameEnded.value = true
-        const win = (isXPlayer.value && xo === 0) || (!isXPlayer.value && xo === 1)
-        await showResultMessage(win)
-        emit('finishGame')
-        return
-        // clearChestboard();
+    return {
+        adjacentCellInTopLeftDiagonal,
+        blockedSide
     }
+} 
 
-    let adjacentCellInSecondDiagonal = 0
+const countAdjacentCelsInTopRightDiagonal = (rowIndex: number, colIndex: number, xo: number) => {
+    let adjacentCellInTopRightDiagonal = 0
+    let blockedSide = 0
+    let i = rowIndex
+    let j = colIndex
+    while (i < 20 && j < 20 && i >= 0 && j >= 0) {
+        if (chessboardData?.[++i]?.[--j] === xo) {
+            adjacentCellInTopRightDiagonal += 1
+        } else {
+            if (chessboardData?.[i]?.[j] !== -1) {
+                blockedSide += 1
+            }
+            break
+        }
+    }
     i = rowIndex
     j = colIndex
-    while (i < 20 && j < 20) {
-        if (chessboardData[++i][--j] === xo) {
-            adjacentCellInSecondDiagonal += 1
+    while (i < 20 && j < 20 && i >= 0 && j >= 0) {
+        if (chessboardData?.[--i]?.[++j] === xo) {
+            adjacentCellInTopRightDiagonal += 1
         } else {
+            if (chessboardData?.[i]?.[j] !== -1) {
+                blockedSide += 1
+            }
             break
         }
     }
-    i = rowIndex
-    j = colIndex
-    while (i < 20 && j < 20) {
-        if (chessboardData[--i][++j] === xo) {
-            adjacentCellInSecondDiagonal += 1
-        } else {
-            break
-        }
+    return {
+        adjacentCellInTopRightDiagonal,
+        blockedSide
     }
-    if (adjacentCellInSecondDiagonal === 4) {
-        gameEnded.value = true
-        const win = (isXPlayer.value && xo === 0) || (!isXPlayer.value && xo === 1)
-        await showResultMessage(win)
-        emit('finishGame')
-        return
-        // clearChestboard();
-    }
-}
+} 
 
-
-watch(props, (oldValue, newValue) => {
-    if (oldValue.time && newValue.time === 0) {
+watch(props, (value) => {
+    if (value.time === 0 && !gameEnded.value) {
+        randomMove()
         emit('resetTime')
     }
-    if (!newValue.isYourTurn && game?.value?.mode === GAME_MODE.PVB) {
+    if (!value.isYourTurn && game?.value?.mode === GAME_MODE.PVB && !gameEnded.value) {
         setTimeout(() => robotMove(), 100)
     }
 })
 
-const robotMove = () => {
+const ROBOT_ATTACK = {
+    4: 999999,
+    3: 10000,
+    2: 500,
+    1: 300,
+    0: 50
+}
+
+const ROBOT_DEFENSE = {
+    4: 100000,
+    3: 8000,
+    2: 400,
+    1: 100,
+    0: 0
+}
+
+const randomMove = () => {
     let randI, randJ
     while (true) {
         randI = Math.round(Math.random() * 19)
@@ -253,6 +347,83 @@ const robotMove = () => {
     emit('resetTime')
 }
 
+const robotMove = () => {
+    // randomMove()
+    let maxScore = -1;
+    let cells: {i: number, j: number, score: number}[] = [];
+    for (let i = 0; i < 20; i += 1) {
+        for (let j = 0; j < 20; j += 1) {
+            if (chessboardData[i][j] === -1) {
+                let cellScore = calculateScore(i, j, props.xoFlag)
+                cells.push( {i, j, score: cellScore})
+                if (cellScore > maxScore) {
+                    maxScore = cellScore
+                }
+            }
+        }
+    }
+    if (cells.length) {
+        cells = cells.filter(cell => cell.score === maxScore)
+        const selectedCell = cells[Math.floor(Math.random() * cells.length)]
+        chessboardData[selectedCell.i][selectedCell.j] = props.xoFlag
+        checkWinner(selectedCell.i, selectedCell.j)
+        if (!gameEnded.value) {
+            emit('setXoFlag')
+            emit('resetTime')
+        }
+    }
+    else {
+        randomMove()
+    }
+}
+
+const calculateScore = (i: number, j: number, xo: number) => {
+    // calculate attack score
+    type ROBOT_ATTACK_KEY = keyof typeof ROBOT_ATTACK;
+    const { adjacentCellInCol } = countAdjacentCellsInCol(i, j, xo)
+    const colScore = ROBOT_ATTACK?.[adjacentCellInCol as ROBOT_ATTACK_KEY] ?? 0
+    const { adjacentCellInRow } = countAdjacentCellsInRow(i, j, xo)
+    const rowScore = ROBOT_ATTACK?.[adjacentCellInRow as ROBOT_ATTACK_KEY] ?? 0
+    const { adjacentCellInTopLeftDiagonal } = countAdjacentCelsInTopLeftDiagonal(i, j ,xo)
+    const topLeftDiagonalScore = ROBOT_ATTACK?.[adjacentCellInTopLeftDiagonal as ROBOT_ATTACK_KEY] ?? 0
+    const { adjacentCellInTopRightDiagonal } = countAdjacentCelsInTopRightDiagonal(i, j ,xo)
+    const topRightDiagonalScore = ROBOT_ATTACK?.[adjacentCellInTopRightDiagonal as ROBOT_ATTACK_KEY] ?? 0
+
+    // calculate defend score
+    const opponentXO = xo ? 0 : 1
+    type ROBOT_DEFENSE_KEY = keyof typeof ROBOT_DEFENSE;
+    const {
+        adjacentCellInCol: adjacentCellsInColOpponent,
+        blockedSide: colBlockedSide 
+    } = countAdjacentCellsInCol(i, j, opponentXO)
+    const opponentColScore = 
+        (ROBOT_DEFENSE?.[adjacentCellsInColOpponent as ROBOT_DEFENSE_KEY] ?? 0) / (colBlockedSide + 1)
+    const { 
+        adjacentCellInRow: adjacentCellsInRowOpponent,
+        blockedSide: rowBlockedSide 
+    } = countAdjacentCellsInRow(i, j, opponentXO)
+    const opponentRowScore = 
+        (ROBOT_DEFENSE?.[adjacentCellsInRowOpponent as ROBOT_DEFENSE_KEY] ?? 0) / (rowBlockedSide + 1)
+    const {
+        adjacentCellInTopLeftDiagonal: adjacentCellsInTopLeftDiagonalOpponent,
+        blockedSide: topLeftDiagonalBlockedSide
+    } = countAdjacentCelsInTopLeftDiagonal(i, j ,opponentXO)
+    const opponentTopLeftDiagonalScore = 
+        (ROBOT_DEFENSE?.[adjacentCellsInTopLeftDiagonalOpponent as ROBOT_DEFENSE_KEY] ?? 0) / (topLeftDiagonalBlockedSide + 1)
+    const {
+        adjacentCellInTopRightDiagonal: adjacentCellsInTopRightDiagonalOpponent,
+        blockedSide: topRightDiagonalBlockedSide
+    } = countAdjacentCelsInTopRightDiagonal(i, j ,opponentXO)
+    const opponentTopRightDiagonalScore = 
+        (ROBOT_DEFENSE?.[adjacentCellsInTopRightDiagonalOpponent as ROBOT_DEFENSE_KEY] ?? 0) / (topRightDiagonalBlockedSide + 1)
+
+    // calculate total score
+    const maxAttackScore = Math.max(colScore, rowScore, topLeftDiagonalScore, topRightDiagonalScore)
+    const attackScore = maxAttackScore + (colScore + rowScore + topLeftDiagonalScore + topRightDiagonalScore - maxAttackScore) / 3
+    const maxDefendScore = Math.max(opponentColScore, opponentRowScore, opponentTopLeftDiagonalScore, opponentTopRightDiagonalScore)
+    const defendScore = maxDefendScore + (opponentColScore + opponentRowScore + opponentTopLeftDiagonalScore + opponentTopRightDiagonalScore - maxDefendScore) / 3
+    return attackScore + defendScore
+}
 onMounted(() => {
     setTimeout(() => {
         if (!props.isYourTurn && game?.value?.mode === GAME_MODE.PVB) {

@@ -74,9 +74,9 @@ const confirm = async () => {
     const createGameData = {
         mode: props.mode as GAME_MODE,
         ...selectValue.value ? {
-            xPlayer: user.value?._id
-        } : {
             oPlayer: user.value?._id
+        } : {
+            xPlayer: user.value?._id
         }
     }
     const result = await createGame(createGameData)
