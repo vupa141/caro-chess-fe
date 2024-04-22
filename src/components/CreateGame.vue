@@ -82,11 +82,6 @@ const confirm = async () => {
     const result = await createGame(createGameData);
     if (result.success) {
         router.push(`/game/${game?.value?._id}`);
-    } else {
-        ElNotification({
-            type: 'error',
-            message: COMMON_ERROR_MSG,
-        });
     }
     emit('close');
 };

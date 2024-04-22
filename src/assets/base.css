@@ -52,6 +52,11 @@
 .router-link-active {
     background-color: unset !important;
 }
+@media (hover: hover) {
+    a:hover {
+        background-color: unset !important;
+    }
+}
 *,
 *::before,
 *::after {

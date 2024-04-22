@@ -40,6 +40,7 @@ axiosInstance.interceptors.response.use(
                 const accessTokenResult = await getAccessToken(refreshToken);
                 axiosInstance.defaults.headers.common['Authorization'] =
                     'Bearer ' + accessTokenResult.data.accessToken;
+                Cookies.set(ACCESS_TOKEN_KEY, accessTokenResult.data.accessToken);
                 return axiosInstance(originalRequest);
             } catch (error) {
                 ElNotification({

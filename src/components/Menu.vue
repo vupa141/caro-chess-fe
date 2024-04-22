@@ -2,7 +2,7 @@
     <el-menu
         active-text-color="#ffd04b"
         background-color="#545c64"
-        class="h-screen !fixed left-0 top-0 w-[220px]"
+        class="h-screen !fixed left-0 top-0 w-[220px] z-[9999]"
         text-color="#fff"
     >
         <div v-if="user" class="flex mt-4 items-center px-4 hover:cursor-pointer hover:opacity-70">
