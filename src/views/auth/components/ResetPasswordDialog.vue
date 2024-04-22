@@ -6,7 +6,7 @@
                     >Enter verification code to reset your password
                     <span class="text-red-500">(*)</span></span
                 >
-                <Field name="token"rules="required" v-slot="{ field }">
+                <Field name="token" rules="required" v-slot="{ field }">
                     <el-input
                         v-bind="field"
                         v-model="token"
@@ -70,54 +70,53 @@
                 <ErrorMessage name="reg-password-confirmation" class="text-red-500" />
             </div>
             <div class="flex justify-end">
-                <el-button type="primary"  class="w-full mt-5" @click="confirm">Confirm</el-button>
+                <el-button type="primary" class="w-full mt-5" @click="confirm">Confirm</el-button>
             </div>
-        </div> 
+        </div>
     </Form>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Form, Field, ErrorMessage } from 'vee-validate'
-import { ElNotification } from 'element-plus'
-import { validatePassword } from '@/common/veeValidateRule'
-import { View, Hide } from '@element-plus/icons-vue'
-import { resetPassword } from '@/services/user.service'
-import type { Error } from '@/interface/common.interface'
+import { ref } from 'vue';
+import { Form, Field, ErrorMessage } from 'vee-validate';
+import { ElNotification } from 'element-plus';
+import { validatePassword } from '@/common/veeValidateRule';
+import { View, Hide } from '@element-plus/icons-vue';
+import { resetPassword } from '@/services/user.service';
+import type { Error } from '@/interface/common.interface';
 
-const token = ref('')
-const formRef = ref<any>(null)
-const password = ref('')
-const passwordConfirmation = ref('')
-const showPassword = ref(false)
-const emit = defineEmits(['openLogin'])
+const token = ref('');
+const formRef = ref<any>(null);
+const password = ref('');
+const passwordConfirmation = ref('');
+const showPassword = ref(false);
+const emit = defineEmits(['openLogin']);
 
 const validatePasswordConfirmation = (value: string) => {
     if (value !== password.value) {
-        return 'Password confirmation must be the same as password'
+        return 'Password confirmation must be the same as password';
     }
-    return true
-}
+    return true;
+};
 
 const toggleShowPassword = () => {
-    showPassword.value = !showPassword.value
-}
+    showPassword.value = !showPassword.value;
+};
 
 const confirm = async () => {
-    const validate = await formRef.value?.validate()
+    const validate = await formRef.value?.validate();
     if (!validate?.valid) {
-        return
+        return;
     }
     try {
         await resetPassword(token.value, password.value);
         ElNotification({
             type: 'success',
-            message: 'Set password success!'
-        })
-        emit('openLogin')
+            message: 'Set password success!',
+        });
+        emit('openLogin');
+    } catch (error) {
+        formRef.value.setFieldError((error as Error)?.errors[0].key, (error as Error)?.message);
     }
-    catch (error) {
-        formRef.value.setFieldError((error as Error)?.errors[0].key, (error as Error)?.message)
-    }
-}
+};
 </script>

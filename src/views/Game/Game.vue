@@ -2,19 +2,16 @@
     <div>
         <div
             class="loading-countdown-overlay fixed top-0 left-0 w-screen h-screen z-[9998] bg-gray-900 opacity-15"
-            v-if="countDown">
-        </div>
+            v-if="countDown"
+        ></div>
         <div
             class="loading-countdown fixed top-0 left-0 w-screen h-screen z-[9999] flex justify-center items-center"
-            v-if="countDown">
+            v-if="countDown"
+        >
             <div class="font-bold text-7xl text-black">{{ countDown }}</div>
         </div>
-    
-        <GameStatus
-            :xoFlag="xoFlag"
-            :time="time"
-            :isYourTurn="isYourTurn"
-        />
+
+        <GameStatus :xoFlag="xoFlag" :time="time" :isYourTurn="isYourTurn" />
         <Chessboard
             ref="chessboardRef"
             :xoFlag="xoFlag"
@@ -25,7 +22,6 @@
             @finishGame="finishGame"
         />
     </div>
-
 </template>
 
 <script setup lang="ts">
@@ -34,71 +30,82 @@ import Chessboard from './components/Chessboard.vue';
 import { useGameStore } from '@/stores/game';
 import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { ref, onUnmounted, computed, watch } from 'vue';
+import { GAME_STATUS } from '@/common/constant';
+import { ElNotification } from 'element-plus';
 
 const { user } = storeToRefs(useAuthStore());
 const { game } = storeToRefs(useGameStore());
 const { getGame } = useGameStore();
 const chessboardRef = ref(null);
-const xoFlag = ref(0)
-const time = ref(60)
-let timeInvertal: any = null
-const countDown = ref(3)
+const xoFlag = ref(0);
+const time = ref(60);
+let timeInvertal: any = null;
+const countDown = ref(3);
 const setXoFlag = () => {
-    xoFlag.value = xoFlag.value ? 0 : 1
-}
+    xoFlag.value = xoFlag.value ? 0 : 1;
+};
 const resetTime = () => {
     time.value = 60;
     clearInterval(timeInvertal);
     timeInvertal = setInterval(() => {
-        time.value --;
+        time.value--;
         if (time.value === 0) {
-            clearInterval(timeInvertal)
+            clearInterval(timeInvertal);
         }
-    }, 1000)
-}
+    }, 1000);
+};
 const isYourTurn = computed(() => {
     if (user?.value?._id === game.value?.xPlayer?._id) {
-        return Boolean(!xoFlag.value)
-    }
-    else {
-        return Boolean(xoFlag.value)
+        return Boolean(!xoFlag.value);
+    } else {
+        return Boolean(xoFlag.value);
     }
 });
 
 const finishGame = () => {
     time.value = 0;
-    clearInterval(timeInvertal)
-}
+    clearInterval(timeInvertal);
+};
 
-const route = useRoute()
-getGame(route.params.id as string)
+const route = useRoute();
+const router = useRouter();
 
-const gameId = computed(() => route.params.id)
+getGame(route.params.id as string).then(() => {
+    if (game.value?.status === GAME_STATUS.FINISHED) {
+        ElNotification({
+            type: 'info',
+            message: 'Game Completed',
+        });
+        router.push('/');
+    }
+});
+
+const gameId = computed(() => route.params.id);
 
 watch(gameId, () => {
-    window.location.reload()
-})
+    window.location.reload();
+});
 const countDownInterval = setInterval(() => {
-    countDown.value --;
+    countDown.value--;
     if (!countDown.value) {
-        clearInterval(countDownInterval)
+        clearInterval(countDownInterval);
     }
-}, 1000)
+}, 1000);
 
 setTimeout(() => {
     timeInvertal = setInterval(() => {
-        time.value --;
+        time.value--;
         if (time.value === 0) {
-            clearInterval(timeInvertal)
+            clearInterval(timeInvertal);
         }
-    }, 1000)
-}, 3000)
+    }, 1000);
+}, 3000);
 
 onUnmounted(() => {
-    clearInterval(timeInvertal)
-})
+    clearInterval(timeInvertal);
+});
 </script>
 
 <style scoped lang="scss"></style>

@@ -1,10 +1,5 @@
-import { ref } from 'vue'
-import { defineStore } from 'pinia'
-import { MODE } from '../common/constant'
+import { defineStore } from 'pinia';
 
 export const useCommonStore = defineStore('common', () => {
-
-    return {  
-    }
-})
-
+    return {};
+});

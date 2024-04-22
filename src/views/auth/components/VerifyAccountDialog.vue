@@ -20,37 +20,36 @@
             <div class="flex justify-end">
                 <el-button type="primary" @click="verify" class="w-full mt-5"> Verify </el-button>
             </div>
-        </div> </Form
-    >
+        </div>
+    </Form>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Form, Field, ErrorMessage } from 'vee-validate'
-import { useAuthStore } from '@/stores/auth'
-import { ElNotification } from 'element-plus'
+import { ref } from 'vue';
+import { Form, Field, ErrorMessage } from 'vee-validate';
+import { useAuthStore } from '@/stores/auth';
+import { ElNotification } from 'element-plus';
 
-const { verifyUser } = useAuthStore()
-const token = ref('')
-const formRef = ref<any>(null)
-const emit = defineEmits(['close'])
+const { verifyUser } = useAuthStore();
+const token = ref('');
+const formRef = ref<any>(null);
+const emit = defineEmits(['close']);
 
 const verify = async () => {
-    const result = await formRef.value?.validate()
+    const result = await formRef.value?.validate();
     if (!result?.valid) {
-        return
+        return;
     }
-    const verifyResult = await verifyUser(token.value)
+    const verifyResult = await verifyUser(token.value);
     if (verifyResult.success) {
         ElNotification({
-        type: 'success',
-        message: 'Verify Email Success!'
-    })
-        emit('close')
+            type: 'success',
+            message: 'Verify Email Success!',
+        });
+        emit('close');
+    } else {
+        const error = verifyResult.error;
+        formRef.value.setFieldError(error?.errors[0].key, error?.message);
     }
-    else {
-        const error = verifyResult.error
-        formRef.value.setFieldError(error?.errors[0].key, error?.message)
-    }
-}
+};
 </script>

@@ -59,54 +59,53 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Form, Field, ErrorMessage } from 'vee-validate'
-import { View, Hide } from '@element-plus/icons-vue'
-import { validateEmail } from '@/common/veeValidateRule'
-import { ElNotification } from 'element-plus'
-import { useAuthStore } from '@/stores/auth'
+import { ref } from 'vue';
+import { Form, Field, ErrorMessage } from 'vee-validate';
+import { View, Hide } from '@element-plus/icons-vue';
+import { validateEmail } from '@/common/veeValidateRule';
+import { ElNotification } from 'element-plus';
+import { useAuthStore } from '@/stores/auth';
 
-const { logIn } = useAuthStore()
+const { logIn } = useAuthStore();
 
-const email = ref('')
-const password = ref('')
-const showPassword = ref(false)
-const formRef = ref<any>(null)
-const emit = defineEmits(['openRegister', 'openForgotPassword', 'close'])
+const email = ref('');
+const password = ref('');
+const showPassword = ref(false);
+const formRef = ref<any>(null);
+const emit = defineEmits(['openRegister', 'openForgotPassword', 'close']);
 const toggleShowPassword = () => {
-    showPassword.value = !showPassword.value
-}
+    showPassword.value = !showPassword.value;
+};
 
 const login = async () => {
-    const validate = await formRef?.value?.validate()
+    const validate = await formRef?.value?.validate();
     if (!validate?.valid) {
-        return
+        return;
     }
-    const loginResult = await logIn({ email: email.value, password: password.value })
+    const loginResult = await logIn({ email: email.value, password: password.value });
     if (loginResult.success) {
         ElNotification({
             type: 'success',
-            message: 'Login Success. Welcome back!'
+            message: 'Login Success. Welcome back!',
         });
         emit('close');
-    }
-    else {
+    } else {
         const error = loginResult.error;
-        formRef.value.setFieldError(error?.errors[0].key, error?.message)
+        formRef.value.setFieldError(error?.errors[0].key, error?.message);
     }
-}
+};
 
 const openRegister = async () => {
-    await formRef?.value?.resetForm()
-    emit('openRegister')
-}
+    await formRef?.value?.resetForm();
+    emit('openRegister');
+};
 
 const openForgotPassword = async () => {
-    await formRef?.value?.resetForm()
-    emit('openForgotPassword')
-}
+    await formRef?.value?.resetForm();
+    emit('openForgotPassword');
+};
 
 defineExpose({
-    formRef
-})
+    formRef,
+});
 </script>

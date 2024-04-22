@@ -95,62 +95,61 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { ElNotification } from 'element-plus'
-import { Form, Field, ErrorMessage } from 'vee-validate'
-import { View, Hide } from '@element-plus/icons-vue'
-import { validateEmail, validatePassword, validateName } from '@/common/veeValidateRule'
-import { useAuthStore } from '@/stores/auth'
-import { avatars } from '@/common/constant'
+import { ref } from 'vue';
+import { ElNotification } from 'element-plus';
+import { Form, Field, ErrorMessage } from 'vee-validate';
+import { View, Hide } from '@element-plus/icons-vue';
+import { validateEmail, validatePassword, validateName } from '@/common/veeValidateRule';
+import { useAuthStore } from '@/stores/auth';
+import { avatars } from '@/common/constant';
 
-const email = ref('')
-const password = ref('')
-const username = ref('')
-const passwordConfirmation = ref('')
-const showPassword = ref(false)
-const registerFormRef = ref<any>(null)
-const emit = defineEmits(['openLogin', 'verify'])
+const email = ref('');
+const password = ref('');
+const username = ref('');
+const passwordConfirmation = ref('');
+const showPassword = ref(false);
+const registerFormRef = ref<any>(null);
+const emit = defineEmits(['openLogin', 'verify']);
 
-const { register } = useAuthStore()
+const { register } = useAuthStore();
 
 const toggleShowPassword = () => {
-    showPassword.value = !showPassword.value
-}
+    showPassword.value = !showPassword.value;
+};
 
 const openLogin = async () => {
-    await registerFormRef.value?.resetForm()
-    emit('openLogin')
-}
+    await registerFormRef.value?.resetForm();
+    emit('openLogin');
+};
 
 const validatePasswordConfirmation = (value: string) => {
     if (value !== password.value) {
-        return 'Password confirmation must be the same as password'
+        return 'Password confirmation must be the same as password';
     }
-    return true
-}
+    return true;
+};
 
 const signUp = async () => {
-    const validate = await registerFormRef.value?.validate()
+    const validate = await registerFormRef.value?.validate();
     if (!validate?.valid) {
-        return
+        return;
     }
     const result = await register({
         username: username.value,
         email: email.value,
         password: password.value,
-        avatar: avatars[Math.round(Math.random() * (avatars.length  - 1))]
-    })
+        avatar: avatars[Math.round(Math.random() * (avatars.length - 1))],
+    });
     if (result.success) {
         ElNotification({
             type: 'success',
-            message: 'Register Success'
-        })
-        registerFormRef.value?.resetForm()
-        emit('verify')
-    }
-    else {
+            message: 'Register Success',
+        });
+        registerFormRef.value?.resetForm();
+        emit('verify');
+    } else {
         const error = result.error;
         registerFormRef.value.setFieldError(error?.errors[0].key, error?.message);
     }
-}
+};
 </script>

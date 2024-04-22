@@ -26,7 +26,7 @@
                     >
                         <el-button type="primary" round>Save Account</el-button>
                     </div>
-                    <el-divider class="!my-1" v-if="user.type === USER_TYPE.GUEST"/>
+                    <el-divider class="!my-1" v-if="user.type === USER_TYPE.GUEST" />
                     <div class="px-8 py-2 hover:text-blue-400 cursor-pointer">
                         <FontAwesomeIcon :icon="faUser" class="mr-2" />
                         My Account
@@ -46,8 +46,10 @@
         </div>
         <el-divider />
         <el-menu-item index="2">
-            <el-icon><HomeFilled /></el-icon>
-            <span>Home</span>
+            <router-link to="/">
+                <el-icon><HomeFilled /></el-icon>
+                <span>Home</span>
+            </router-link>
         </el-menu-item>
         <el-menu-item index="3" v-if="user">
             <el-icon><Histogram /></el-icon>
@@ -70,95 +72,95 @@
         <el-divider />
     </el-menu>
     <AuthDialog :openModal="openAuth" @close="onCloseAuthDialog" />
-    <GuestRegisterDialog :openModal="openGuestRegister" @close="onCloseGuestRegister" @success="onGuestRegisterSuccess"/>
-    <CreateGame :openModal="openCreateGame" @close="onCloseCreateGame" :mode="selectedGameMode"/>
+    <GuestRegisterDialog
+        :openModal="openGuestRegister"
+        @close="onCloseGuestRegister"
+        @success="onGuestRegisterSuccess"
+    />
+    <CreateGame :openModal="openCreateGame" @close="onCloseCreateGame" :mode="selectedGameMode" />
 </template>
 
 <script lang="ts" setup>
-import { Histogram, HomeFilled } from '@element-plus/icons-vue'
-import AuthDialog from '@/views/auth/AuthDialog.vue'
-import GuestRegisterDialog from '@/views/auth/GuestRegisterDialog.vue'
-import CreateGame from './CreateGame.vue'
-import { ref } from 'vue'
-import { useAuthStore } from '@/stores/auth'
-import { ACCESS_TOKEN_KEY, GAME_MODE, GUEST_ID, USER_TYPE } from '@/common/constant'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { Histogram, HomeFilled } from '@element-plus/icons-vue';
+import AuthDialog from '@/views/auth/AuthDialog.vue';
+import GuestRegisterDialog from '@/views/auth/GuestRegisterDialog.vue';
+import CreateGame from './CreateGame.vue';
+import { ref } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+import { ACCESS_TOKEN_KEY, GAME_MODE, GUEST_ID, USER_TYPE } from '@/common/constant';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
     faSignOut,
     faUser,
     faSignIn,
     faGamepad,
     faUserFriends,
-    faRobot
-} from '@fortawesome/free-solid-svg-icons'
-import { storeToRefs } from 'pinia'
-import Cookies from 'js-cookie'
+    faRobot,
+} from '@fortawesome/free-solid-svg-icons';
+import { storeToRefs } from 'pinia';
+import Cookies from 'js-cookie';
 
-const { user } = storeToRefs(useAuthStore())
-const { getUser, logOut, guestLogIn } = useAuthStore()
+const { user } = storeToRefs(useAuthStore());
+const { getUser, logOut, guestLogIn } = useAuthStore();
 
-const openAuth = ref(false)
-const openGuestRegister = ref(false)
-const openCreateGame = ref(false)
-const selectedGameMode = ref<GAME_MODE | null>(null)
+const openAuth = ref(false);
+const openGuestRegister = ref(false);
+const openCreateGame = ref(false);
+const selectedGameMode = ref<GAME_MODE | null>(null);
 
 const onCloseAuthDialog = () => {
-    openAuth.value = false
-}
+    openAuth.value = false;
+};
 
 const onCloseGuestRegister = () => {
-    openGuestRegister.value = false
-}
+    openGuestRegister.value = false;
+};
 
 const onOpenAuthDialog = () => {
-    openAuth.value = true
-}
+    openAuth.value = true;
+};
 
 const onCloseCreateGame = () => {
-    openCreateGame.value = false
-    selectedGameMode.value = null
-}
+    openCreateGame.value = false;
+    selectedGameMode.value = null;
+};
 
 const getUserProfile = async () => {
     const guestId = localStorage.getItem(GUEST_ID);
     if (guestId) {
         await guestLogIn();
-    }
-    else {
+    } else {
         const accessToken = Cookies.get(ACCESS_TOKEN_KEY);
         if (accessToken) {
-            await getUser()
+            await getUser();
         }
     }
-}
+};
 const logout = () => {
-    logOut()
-}
+    logOut();
+};
 const playWithFriend = () => {
-    selectedGameMode.value = GAME_MODE.PVP
+    selectedGameMode.value = GAME_MODE.PVP;
     if (user.value) {
-        openCreateGame.value = true
+        openCreateGame.value = true;
+    } else {
+        openGuestRegister.value = true;
     }
-    else {
-        openGuestRegister.value = true
-    }
-}
+};
 const playWithRobot = () => {
-    selectedGameMode.value = GAME_MODE.PVB
+    selectedGameMode.value = GAME_MODE.PVB;
     if (user.value) {
-        openCreateGame.value = true
+        openCreateGame.value = true;
+    } else {
+        openGuestRegister.value = true;
     }
-    else {
-        openGuestRegister.value = true
-    }
-}
+};
 
 const onGuestRegisterSuccess = () => {
-    openCreateGame.value = true
-}
+    openCreateGame.value = true;
+};
 
 getUserProfile();
-
 </script>
 
 <style lang="scss">
