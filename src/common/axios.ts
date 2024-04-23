@@ -38,7 +38,8 @@ axiosInstance.interceptors.response.use(
         ) {
             try {
                 const accessTokenResult = await getAccessToken(refreshToken);
-                axiosInstance.defaults.headers.common['Authorization'] = 'Bearer ' + accessTokenResult.data.accessToken;
+                axiosInstance.defaults.headers.common['Authorization'] =
+                    'Bearer ' + accessTokenResult.data.accessToken;
                 Cookies.set(ACCESS_TOKEN_KEY, accessTokenResult.data.accessToken);
                 return axiosInstance(originalRequest);
             } catch (error) {

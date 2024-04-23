@@ -5,6 +5,7 @@ import type {
     CreateMoveData,
     FinishGameData,
     Game,
+    Move,
 } from '@/interface/game.interface';
 import {
     createGameMove,
@@ -15,6 +16,7 @@ import {
 
 export const useGameStore = defineStore('game', () => {
     const game = ref<Game | null>(null);
+    const newMove = ref<Move | null>(null);
 
     const createGame = async (createGameData: CreateGameData) => {
         const result = await createGameToServer(createGameData);
@@ -32,7 +34,7 @@ export const useGameStore = defineStore('game', () => {
 
     const getGame = async (id: string) => {
         const result = await getGameFromServer(id);
-        if (result.success) {
+        if (result?.success) {
             game.value = result.data;
             return {
                 success: true,
@@ -47,7 +49,7 @@ export const useGameStore = defineStore('game', () => {
     const createMove = async (moveData: CreateMoveData) => {
         const result = await createGameMove(moveData);
         if (result.success) {
-            game.value = result.data;
+            // game.value = result.data;
             return {
                 success: true,
             };
@@ -71,5 +73,6 @@ export const useGameStore = defineStore('game', () => {
             };
         }
     };
-    return { game, createGame, getGame, createMove, completeGame };
+
+    return { game, createGame, getGame, createMove, completeGame, newMove };
 });

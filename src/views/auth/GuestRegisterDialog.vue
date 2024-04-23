@@ -1,5 +1,11 @@
 <template>
-    <el-dialog v-model="open" title="Welcome to Caro Game!" width="500" :before-close="handleClose">
+    <el-dialog
+        v-model="open"
+        title="Welcome to Caro Game!"
+        width="500"
+        :before-close="handleClose"
+        :show-close="props.showClose"
+    >
         <div>
             <span class="font-bold text-2xl">Enter your nickname</span>
             <el-input v-model="username" placeholder="Your Nickname" class="mt-2" size="large" />
@@ -25,6 +31,10 @@ import { ref, watch } from 'vue';
 
 const props = defineProps({
     openModal: Boolean,
+    showClose: {
+        type: Boolean,
+        default: true,
+    },
 });
 
 const { guestRegister } = useAuthStore();

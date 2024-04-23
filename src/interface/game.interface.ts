@@ -25,7 +25,7 @@ export interface Game {
     mode: GAME_MODE;
     xPlayer?: string | any;
     oPlayer?: string | any;
-    move: Move[];
+    createdBy: string;
 }
 
 export interface Move {

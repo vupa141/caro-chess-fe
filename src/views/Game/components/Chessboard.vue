@@ -29,7 +29,11 @@
         </div>
         <el-dialog v-model="dialogVisible" width="400" class="!rounded-md" align-center>
             <div class="flex justify-center items-center">
-                <FontAwesomeIcon :icon="resultIcon" class="mr-2 text-3xl" color="gray" />
+                <FontAwesomeIcon
+                    :icon="resultIcon"
+                    class="mr-2 text-3xl"
+                    :color="resultIconColor"
+                />
                 <div class="text-lg font-semi-bold">{{ resultMessage }}</div>
             </div>
             <template #footer>
@@ -46,16 +50,17 @@ import { reactive, ref, watch, onMounted, computed } from 'vue';
 import { useGameStore } from '@/stores/game';
 import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia';
-import { GAME_MODE, MOVE_TYPE } from '@/common/constant';
+import { GAME_MODE, GAME_STATUS, MOVE_TYPE } from '@/common/constant';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faFaceSadCry, faMedal } from '@fortawesome/free-solid-svg-icons';
 
-const { game } = storeToRefs(useGameStore());
+const { game, newMove } = storeToRefs(useGameStore());
 const { user } = storeToRefs(useAuthStore());
 const { createMove, completeGame } = useGameStore();
 const dialogVisible = ref(false);
 const resultMessage = ref('');
 const resultIcon = ref<any>(null);
+const resultIconColor = ref('gray');
 const gameEnded = ref(false);
 let chessboardData = reactive<number[][]>([]);
 const cellFilled = ref(0);
@@ -90,14 +95,6 @@ const initChessboard = () => {
 
 initChessboard();
 
-const clearChestboard = () => {
-    for (let i = 0; i < 20; i += 1) {
-        for (let j = 0; j < 20; j += 1) {
-            chessboardData[i][j] = -1;
-        }
-    }
-};
-
 const showResultMessage = (win: number) => {
     resultMessage.value =
         win === 1
@@ -106,6 +103,7 @@ const showResultMessage = (win: number) => {
             ? 'You lost. Better luck next time.'
             : "It's a draw.";
     resultIcon.value = win >= 0 ? faMedal : faFaceSadCry;
+    resultIconColor.value = win > 0 ? '#FFD700' : 'gray';
     dialogVisible.value = true;
 };
 
@@ -312,6 +310,34 @@ watch(props, (value) => {
         setTimeout(() => robotMove(), 100);
     }
 });
+
+watch(newMove, (value) => {
+    if (
+        value?.xPosition &&
+        value?.yPosition &&
+        chessboardData[value.xPosition][value.yPosition] === -1
+    ) {
+        opponentMove(value.xPosition, value.yPosition);
+        newMove.value = null;
+    }
+});
+
+watch(game, (gameValue) => {
+    if (gameValue?.status === GAME_STATUS.FINISHED && gameValue?.mode === GAME_MODE.PVP) {
+        gameEnded.value = true;
+        resultMessage.value = 'Oops. Your friend quit.';
+        resultIcon.value = faFaceSadCry;
+        resultIconColor.value = 'gray';
+        dialogVisible.value = true;
+    }
+});
+
+const opponentMove = (i: number, j: number) => {
+    chessboardData[i][j] = props.xoFlag;
+    checkWinner(i, j);
+    emit('setXoFlag');
+    emit('resetTime');
+};
 
 const ROBOT_ATTACK = {
     4: 999999,

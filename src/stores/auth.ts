@@ -16,7 +16,7 @@ import { cloneDeep } from 'lodash';
 import { useRouter } from 'vue-router';
 import { socket } from '@/common/socket';
 
-const router = useRouter()
+const router = useRouter();
 export const useAuthStore = defineStore('auth', () => {
     const user = ref<User | null>(null);
 
@@ -91,7 +91,7 @@ export const useAuthStore = defineStore('auth', () => {
         user.value = null;
         Cookies.remove(ACCESS_TOKEN_KEY);
         Cookies.remove(REFRESH_TOKEN_KEY);
-        router.push('/')
+        router?.push('/');
     }
 
     async function getUser() {
@@ -170,9 +170,3 @@ export const useAuthStore = defineStore('auth', () => {
         guestLogIn,
     };
 });
-
-// {
-//   username: 'Vu PA',
-//   avatar: '/default-avatar/default-avatar-1.svg',
-//   type: USER_TYPE.GUEST
-// }

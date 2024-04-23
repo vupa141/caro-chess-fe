@@ -1,10 +1,5 @@
 <template>
-    <el-dialog
-        v-model="open"
-        title="Start a game"
-        width="500"
-        :before-close="handleClose"
-    >
+    <el-dialog v-model="open" title="Start a game" width="500" :before-close="handleClose">
         <div class="font-bold text-2xl">Who will go first?</div>
         <div class="mt-5">
             <el-select v-model="selectValue" placeholder="Select" size="large" style="width: 240px">
