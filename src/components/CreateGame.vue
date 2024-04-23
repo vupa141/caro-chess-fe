@@ -1,7 +1,7 @@
 <template>
     <el-dialog
         v-model="open"
-        title="Start a game with robot!"
+        title="Start a game"
         width="500"
         :before-close="handleClose"
     >
@@ -26,12 +26,11 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { COMMON_ERROR_MSG, GAME_MODE } from '../common/constant';
+import { GAME_MODE } from '../common/constant';
 import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import { useGameStore } from '@/stores/game';
-import { ElNotification } from 'element-plus';
 
 const props = defineProps<{
     openModal: boolean;

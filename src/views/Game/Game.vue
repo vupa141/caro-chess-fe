@@ -32,7 +32,7 @@ import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia';
 import { useRoute, useRouter } from 'vue-router';
 import { ref, onUnmounted, computed, watch } from 'vue';
-import { GAME_STATUS } from '@/common/constant';
+import { GAME_MODE, GAME_STATUS } from '@/common/constant';
 import { ElNotification } from 'element-plus';
 
 const { user } = storeToRefs(useAuthStore());
@@ -41,6 +41,7 @@ const { getGame } = useGameStore();
 const chessboardRef = ref(null);
 const xoFlag = ref(0);
 const time = ref(60);
+const showWaiting = ref(false)
 let timeInvertal: any = null;
 const countDown = ref(3);
 const setXoFlag = () => {
@@ -72,6 +73,9 @@ const finishGame = () => {
 const route = useRoute();
 const router = useRouter();
 
+if (!user.value) {
+    router.push('/')
+}
 getGame(route.params.id as string).then(() => {
     if (game.value?.status === GAME_STATUS.FINISHED) {
         ElNotification({
@@ -80,6 +84,23 @@ getGame(route.params.id as string).then(() => {
         });
         router.push('/');
     }
+    else if (game.value?.mode === GAME_MODE.PVB) {
+        const countDownInterval = setInterval(() => {
+            countDown.value--;
+            if (!countDown.value) {
+                clearInterval(countDownInterval);
+            }
+        }, 1000);
+
+        setTimeout(() => {
+            timeInvertal = setInterval(() => {
+                time.value--;
+                if (time.value === 0) {
+                    clearInterval(timeInvertal);
+                }
+            }, 1000);
+        }, 3000);
+    }
 });
 
 const gameId = computed(() => route.params.id);
@@ -87,25 +108,11 @@ const gameId = computed(() => route.params.id);
 watch(gameId, () => {
     window.location.reload();
 });
-const countDownInterval = setInterval(() => {
-    countDown.value--;
-    if (!countDown.value) {
-        clearInterval(countDownInterval);
-    }
-}, 1000);
-
-setTimeout(() => {
-    timeInvertal = setInterval(() => {
-        time.value--;
-        if (time.value === 0) {
-            clearInterval(timeInvertal);
-        }
-    }, 1000);
-}, 3000);
 
 onUnmounted(() => {
     clearInterval(timeInvertal);
 });
+
 </script>
 
 <style scoped lang="scss"></style>

@@ -13,7 +13,10 @@ import type { LoginData, SignupData, User } from '@/interface/auth.interface';
 import type { Error, RequestResult } from '@/interface/common.interface';
 import Cookies from 'js-cookie';
 import { cloneDeep } from 'lodash';
+import { useRouter } from 'vue-router';
+import { socket } from '@/common/socket';
 
+const router = useRouter()
 export const useAuthStore = defineStore('auth', () => {
     const user = ref<User | null>(null);
 
@@ -29,6 +32,8 @@ export const useAuthStore = defineStore('auth', () => {
             Cookies.set(ACCESS_TOKEN_KEY, accessToken);
             Cookies.set(REFRESH_TOKEN_KEY, refreshToken);
             localStorage.removeItem(GUEST_ID);
+            (socket.auth as any).token = `Bearer ${accessToken}`;
+            socket.disconnect().connect();
             return {
                 success: true,
             };
@@ -86,6 +91,7 @@ export const useAuthStore = defineStore('auth', () => {
         user.value = null;
         Cookies.remove(ACCESS_TOKEN_KEY);
         Cookies.remove(REFRESH_TOKEN_KEY);
+        router.push('/')
     }
 
     async function getUser() {
@@ -112,6 +118,8 @@ export const useAuthStore = defineStore('auth', () => {
             Cookies.set(ACCESS_TOKEN_KEY, accessToken);
             Cookies.set(REFRESH_TOKEN_KEY, refreshToken);
             localStorage.setItem(GUEST_ID, newUser._id);
+            (socket.auth as any).token = `Bearer ${accessToken}`;
+            socket.disconnect().connect();
             return {
                 success: true,
             };
@@ -136,6 +144,8 @@ export const useAuthStore = defineStore('auth', () => {
                 user.value = newUser;
                 Cookies.set(ACCESS_TOKEN_KEY, accessToken);
                 Cookies.set(REFRESH_TOKEN_KEY, refreshToken);
+                (socket.auth as any).token = `Bearer ${accessToken}`;
+                socket.disconnect().connect();
                 return {
                     success: true,
                 };
