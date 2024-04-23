@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="open" title="Welcome to Caro Game!" width="500" :before-close="handleClose">
+    <el-dialog v-model="open" title="Welcome to Caro Game!" :width="screenWidth < 500 ? screenWidth * 0.9 : 500" :before-close="handleClose">
         <LoginDialog
             ref="loginRef"
             v-if="mode === MODE.LOGIN"
@@ -29,6 +29,10 @@ import RegisterDialog from './components/RegisterDialog.vue';
 import ForgotPasswordDialog from './components/ForgotPasswordDialog.vue';
 import VerifyAccountDialog from './components/VerifyAccountDialog.vue';
 import ResetPasswordDialog from './components/ResetPasswordDialog.vue';
+import { useCommonStore } from '@/stores/common';
+import { storeToRefs } from 'pinia';
+
+const { screenWidth } = storeToRefs(useCommonStore());
 const props = defineProps({
     openModal: Boolean,
 });

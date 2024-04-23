@@ -62,5 +62,6 @@ export const SCREEN_WIDTH_BREAKPOINT = {
     LG: 1024,
     MD: 768,
     SM: 640,
-    XS: 576
+    XS: 576,
+    '2XS': 430
 }

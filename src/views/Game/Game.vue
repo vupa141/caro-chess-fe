@@ -15,7 +15,7 @@
                 <el-button :icon="Back" @click="backToHome" />
             </div>
             <div>
-                <GameStatus :xoFlag="xoFlag" :time="time" :isYourTurn="isYourTurn" />
+                <GameStatus :time="time" :isYourTurn="isYourTurn" />
                 <Chessboard
                     :xoFlag="xoFlag"
                     @setXoFlag="setXoFlag"

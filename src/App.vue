@@ -7,6 +7,7 @@ import { useCommonStore } from './stores/common';
 const route = useRoute();
 const { setScreenWidth } = useCommonStore();
 
+setScreenWidth(window.innerWidth)
 window.addEventListener('resize', () => {
     setScreenWidth(window.innerWidth)
 })

@@ -2,7 +2,7 @@
     <el-dialog
         v-model="open"
         title="Welcome to Caro Game!"
-        width="500"
+        :width="screenWidth < 500 ? screenWidth * 0.9 : 500"
         :before-close="handleClose"
         :show-close="props.showClose"
     >
@@ -28,7 +28,10 @@ import { COMMON_ERROR_MSG } from '@/common/constant';
 import { useAuthStore } from '@/stores/auth';
 import { ElNotification } from 'element-plus';
 import { ref, watch } from 'vue';
+import { useCommonStore } from '@/stores/common';
+import { storeToRefs } from 'pinia';
 
+const { screenWidth } = storeToRefs(useCommonStore());
 const props = defineProps({
     openModal: Boolean,
     showClose: {

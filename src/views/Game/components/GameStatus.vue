@@ -9,13 +9,13 @@
             />
             <div class="text-center mt-1">{{ game?.xPlayer?.username ?? 'Robot' }}</div>
         </div>
-        <div class="xs:w-60 w-40">
+        <div class="xs:w-60 2xs:w-40 w-30">
             <div
-                :class="`text-center turn bg-red-500 rounded-lg py-2 px-5 text-white h-fit ${
+                :class="`text-center turn rounded-lg py-2 px-5 text-white h-fit ${
                     props.isYourTurn ? 'bg-green-500' : 'bg-red-500'
                 }`"
             >
-                <div>
+                <div class="max-xs:text-xs">
                     {{ props.isYourTurn ? 'Your Turn' : "Opponent's turn" }}
                 </div>
             </div>
@@ -49,7 +49,6 @@ import { storeToRefs } from 'pinia';
 const { game } = storeToRefs(useGameStore());
 
 const props = defineProps<{
-    xoFlag: number;
     time: number;
     isYourTurn: boolean;
 }>();

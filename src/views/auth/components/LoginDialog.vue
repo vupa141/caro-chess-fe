@@ -39,7 +39,7 @@
                 <el-button type="primary" @click="login" class="w-full mt-5"> Log In </el-button>
             </div>
             <div class="mt-5 flex justify-between">
-                <div>
+                <div class="mr-4">
                     Need an account?
                     <span class="text-blue-500 cursor-pointer underline" @click="openRegister">
                         Register Here

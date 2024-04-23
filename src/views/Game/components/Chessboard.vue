@@ -521,6 +521,12 @@ onMounted(() => {
         height: 16px;
     }
 }
+@media screen and (max-width: 430px) {
+    .chessboard-container .record {
+        width: 13px;
+        height: 13px;
+    }
+}
 .border-top-2 {
     border-top-width: 2px !important;
 }

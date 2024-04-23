@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="open" width="500" :before-close="handleClose">
+    <el-dialog v-model="open" :width="screenWidth < 500 ? screenWidth * 0.9 : 500" :before-close="handleClose">
         <div class="font-bold text-2xl">Back To Home</div>
         <div class="mt-5">
             Are you sure to go to home page? Your game progress will be lost.
@@ -19,7 +19,10 @@
 import { terminateGame } from '@/services/game.service';
 import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { useCommonStore } from '@/stores/common';
+import { storeToRefs } from 'pinia';
 
+const { screenWidth } = storeToRefs(useCommonStore());
 const props = defineProps<{
     openModal: boolean;
 }>();
