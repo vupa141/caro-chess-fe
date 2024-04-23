@@ -1,5 +1,5 @@
 <template>
-    <div class="p-5 bg-white shadow-lg rounded-md max-w-[900px]">
+    <div class="p-5 bg-white shadow-lg rounded-md max-w-[900px] lg:ml-[200px]">
         <p class="font-bold text-center mb-8 text-2xl">
             Caro Game: Challenge Your Friends to a Classic Game of Five-in-a-Row
         </p>
@@ -14,22 +14,22 @@
             </p>
         </div>
 
-        <div class="flex w-full justify-between">
-            <div class="flex items-center bg-slate-200 py-2 px-4 rounded-lg shadow-lg">
+        <div class="grid lg:grid-cols-4 gap-5 max-lg:grid-cols-2">
+            <div class="flex items-center bg-slate-200 py-2 px-4 rounded-lg shadow-lg ">
                 <el-icon color="#4cbb17" size="30"><CircleCheckFilled /></el-icon>
-                <span class="ml-4 text-xl">100% Free</span>
+                <span class="ml-4 md:text-xl sm:text-base text-xs">100% Free</span>
             </div>
             <div class="flex items-center bg-slate-200 py-2 px-4 rounded-lg shadow-lg">
                 <el-icon color="#4cbb17" size="30"><CircleCheckFilled /></el-icon>
-                <span class="ml-4 text-xl">Multiplayer</span>
+                <span class="ml-4 md:text-xl sm:text-base text-xs">Multiplayer</span>
             </div>
             <div class="flex items-center bg-slate-200 py-2 px-4 rounded-lg shadow-lg">
                 <el-icon color="#4cbb17" size="30"><CircleCheckFilled /></el-icon>
-                <span class="ml-4 text-xl">User Friendly</span>
+                <span class="ml-4 md:text-xl sm:text-base text-xs">User Friendly</span>
             </div>
             <div class="flex items-center bg-slate-200 py-2 px-4 rounded-lg shadow-lg">
                 <el-icon color="#4cbb17" size="30"><CircleCheckFilled /></el-icon>
-                <span class="ml-4 text-xl">Easy To Play</span>
+                <span class="ml-4 md:text-xl sm:text-base text-xs">Easy To Play</span>
             </div>
         </div>
 

@@ -1,11 +1,20 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router';
 import Menu from './components/Menu.vue';
+import { useRoute } from 'vue-router';
+import { useCommonStore } from './stores/common';
+
+const route = useRoute();
+const { setScreenWidth } = useCommonStore();
+
+window.addEventListener('resize', () => {
+    setScreenWidth(window.innerWidth)
+})
 </script>
 
 <template>
-    <Menu />
-    <RouterView />
+    <Menu v-if="route.name !== 'game'" />
+    <RouterView :class="{'max-lg:mt-16': route.name !== 'game'}"/>
 </template>
 
 <style scoped>

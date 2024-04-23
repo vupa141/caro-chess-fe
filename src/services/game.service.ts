@@ -78,3 +78,7 @@ export async function joinGame(gameId: string, userId: string) {
         };
     }
 }
+
+export async function terminateGame() {
+    socket.emit('terminate-game')
+}

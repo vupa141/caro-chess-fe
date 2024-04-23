@@ -57,3 +57,10 @@ export const avatars = [
     '/default-avatar/default-avatar-3.webp',
     '/default-avatar/default-avatar-4.png',
 ];
+
+export const SCREEN_WIDTH_BREAKPOINT = {
+    LG: 1024,
+    MD: 768,
+    SM: 640,
+    XS: 576
+}

@@ -10,21 +10,34 @@
         >
             <div class="font-bold text-7xl text-black">{{ countDown }}</div>
         </div>
+        <div class="flex justify-center">
+            <div class="mr-5">
+                <el-button :icon="Back" @click="backToHome" />
+            </div>
+            <div>
+                <GameStatus :xoFlag="xoFlag" :time="time" :isYourTurn="isYourTurn" />
+                <Chessboard
+                    :xoFlag="xoFlag"
+                    @setXoFlag="setXoFlag"
+                    :time="time"
+                    @resetTime="resetTime"
+                    :isYourTurn="isYourTurn"
+                    @finishGame="finishGame"
+                />
+            </div>
+        </div>
 
-        <GameStatus :xoFlag="xoFlag" :time="time" :isYourTurn="isYourTurn" />
-        <Chessboard
-            :xoFlag="xoFlag"
-            @setXoFlag="setXoFlag"
-            :time="time"
-            @resetTime="resetTime"
-            :isYourTurn="isYourTurn"
-            @finishGame="finishGame"
-        />
+
         <Waiting :openModal="showWaiting" :link="gameUrl" />
         <GuestRegisterDialog
             :openModal="openGuestRegister"
             :showClose="false"
             @success="onGuestRegisterSuccess"
+        />
+        <BackToHomeConfirm
+            :openModal="openBackToHomeConfirm"
+            @close="openBackToHomeConfirm = false"
+            @terminate="finishGame"
         />
     </div>
 </template>
@@ -33,8 +46,9 @@
 import GameStatus from './components/GameStatus.vue';
 import Chessboard from './components/Chessboard.vue';
 import Waiting from './components/Waiting.vue';
+import BackToHomeConfirm from './components/BackToHomeConfirm.vue';
 import GuestRegisterDialog from '../auth/GuestRegisterDialog.vue';
-
+import { Back } from '@element-plus/icons-vue';
 import { useGameStore } from '@/stores/game';
 import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia';
@@ -51,9 +65,11 @@ const xoFlag = ref(0);
 const time = ref(60);
 const showWaiting = ref(false);
 const openGuestRegister = ref(false);
+const openBackToHomeConfirm = ref(false);
 const pvpGameStarted = ref(false);
 let timeInvertal: any = null;
 const countDown = ref(0);
+const finished = ref(false);
 const setXoFlag = () => {
     xoFlag.value = xoFlag.value ? 0 : 1;
 };
@@ -67,6 +83,15 @@ const resetTime = () => {
         }
     }, 1000);
 };
+const backToHome = () => {
+    if (!finished.value) {
+        openBackToHomeConfirm.value = true;
+    }
+    else {
+        router.push('/')
+    }
+};
+
 const isYourTurn = computed(() => {
     if (user?.value?._id === game.value?.xPlayer?._id) {
         return Boolean(!xoFlag.value);
@@ -78,6 +103,7 @@ const isYourTurn = computed(() => {
 const finishGame = () => {
     time.value = 0;
     clearInterval(timeInvertal);
+    finished.value = true;
 };
 
 const route = useRoute();

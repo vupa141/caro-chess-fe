@@ -5,11 +5,11 @@
         <div class="x-player">
             <img
                 :src="game?.xPlayer?.avatar ?? '/default-avatar/default-avatar-1.svg'"
-                class="rounded-full w-[50px] h-[50px] object-cover"
+                class="rounded-full md:w-[50px] md:h-[50px] w-[30px] h-[30px] object-cover"
             />
             <div class="text-center mt-1">{{ game?.xPlayer?.username ?? 'Robot' }}</div>
         </div>
-        <div class="w-60">
+        <div class="xs:w-60 w-40">
             <div
                 :class="`text-center turn bg-red-500 rounded-lg py-2 px-5 text-white h-fit ${
                     props.isYourTurn ? 'bg-green-500' : 'bg-red-500'
@@ -35,7 +35,7 @@
         <div class="o-player">
             <img
                 :src="game?.oPlayer?.avatar ?? '/default-avatar/default-avatar-1.svg'"
-                class="rounded-full w-[50px] h-[50px] object-cover"
+                class="rounded-full md:w-[50px] md:h-[50px] w-[30px] h-[30px] object-cover"
             />
             <div class="text-center mt-1">{{ game?.oPlayer?.username ?? 'Robot' }}</div>
         </div>

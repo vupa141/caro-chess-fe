@@ -53,7 +53,10 @@ import { storeToRefs } from 'pinia';
 import { GAME_MODE, GAME_STATUS, MOVE_TYPE } from '@/common/constant';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faFaceSadCry, faMedal } from '@fortawesome/free-solid-svg-icons';
+import { useCommonStore } from '@/stores/common';
+import { SCREEN_WIDTH_BREAKPOINT } from '@/common/constant';
 
+const { screenWidth } = storeToRefs(useCommonStore())
 const { game, newMove } = storeToRefs(useGameStore());
 const { user } = storeToRefs(useAuthStore());
 const { createMove, completeGame } = useGameStore();
@@ -329,6 +332,7 @@ watch(game, (gameValue) => {
         resultIcon.value = faFaceSadCry;
         resultIconColor.value = 'gray';
         dialogVisible.value = true;
+        emit('finishGame');
     }
 });
 
@@ -498,10 +502,23 @@ onMounted(() => {
 .chessboard-container {
     margin: auto;
     border-radius: 12px;
+    width: fit-content;
     .record {
-        width: 25px;
-        height: 25px;
+        width: 26px;
+        height: 26px;
         cursor: pointer;
+    }
+}
+@media screen and (max-width: 640px) {
+    .chessboard-container .record {
+        width: 20px;
+        height: 20px;
+    }
+}
+@media screen and (max-width: 520px) {
+    .chessboard-container .record {
+        width: 16px;
+        height: 16px;
     }
 }
 .border-top-2 {
