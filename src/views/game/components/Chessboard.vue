@@ -489,12 +489,8 @@ const finishGame = (xo: number) => {
     emit('finishGame');
 };
 
-onMounted(() => {
-    setTimeout(() => {
-        if (!props.isYourTurn && game?.value?.mode === GAME_MODE.PVB) {
-            robotMove();
-        }
-    }, 3000);
+defineExpose({
+    robotMove,
 });
 </script>
 

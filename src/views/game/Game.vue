@@ -23,6 +23,7 @@
                     @resetTime="resetTime"
                     :isYourTurn="isYourTurn"
                     @finishGame="finishGame"
+                    ref="chessboardRef"
                 />
             </div>
         </div>
@@ -61,6 +62,7 @@ import { joinGame } from '@/services/game.service';
 const { user } = storeToRefs(useAuthStore());
 const { game } = storeToRefs(useGameStore());
 const { getGame } = useGameStore();
+const chessboardRef = ref(null);
 const xoFlag = ref(0);
 const time = ref(60);
 const showWaiting = ref(false);
@@ -175,6 +177,11 @@ const startGame = () => {
     }, 1000);
 
     setTimeout(() => {
+        setTimeout(() => {
+            if (game.value?.mode === GAME_MODE.PVB && !isYourTurn.value) {
+                (chessboardRef.value as any).robotMove()
+            }
+        }, 1500)
         timeInvertal = setInterval(() => {
             time.value--;
             if (time.value === 0) {
