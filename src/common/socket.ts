@@ -25,6 +25,7 @@ export const socket = io(URL, {
     auth: {
         token: `Bearer ${Cookies.get(ACCESS_TOKEN_KEY)}`,
     },
+    transports: ['websocket', 'polling', 'flashsocket']
 });
 
 socket.on('connect', () => {
